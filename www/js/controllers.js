@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [''])
+angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function ($scope, $ionicModal, $timeout) {
 
@@ -41,28 +41,61 @@ angular.module('starter.controllers', [''])
     };
 })
 
-.controller('PlaylistsCtrl', function ($scope) {
-    $scope.playlists = [
-      { title: 'Reggae', id: 1 },
-      { title: 'Chill', id: 2 },
-      { title: 'Dubstep', id: 3 },
-      { title: 'Indie', id: 4 },
-      { title: 'Rap', id: 5 },
-      { title: 'Cowbell', id: 6 }
+.controller('EventsCtrl', function ($scope) {
+    $scope.events = [
+        {
+            title: 'Festival de la Musique',
+            id: 1
+        },
+        {
+            title: 'Carnaval',
+            id: 2
+        },
+        {
+            title: 'Union pour la paix',
+            id: 3
+        },
+        {
+            title: "Envol d'oiseaux migratoires",
+            id: 4
+        }
     ];
 })
 
-.controller('PlaylistCtrl', function ($scope, $stateParams) {
-})
+.controller('EventCtrl', function ($scope, $stateParams) {})
 
 .controller('MapCtrl', function ($scope) {
     $scope.cities = [
-      { title: 'Paris', id: 1 },
-      { title: 'Dublin', id: 2 },
-      { title: 'London', id: 3 },
-      { title: 'Oran', id: 4 },
-      { title: 'Tokyo', id: 5 },
-      { title: 'Washington', id: 6 }
+        {
+            title: 'Paris',
+            id: 1
+        },
+        {
+            title: 'Dublin',
+            id: 2
+        },
+        {
+            title: 'London',
+            id: 3
+        },
+        {
+            title: 'Oran',
+            id: 4
+        },
+        {
+            title: 'Tokyo',
+            id: 5
+        },
+        {
+            title: 'Washington',
+            id: 6
+        }
     ];
-    $scope.map = { center: { latitude: 45, longitude: -73 }, zoom: 8 };
+    $scope.map = {
+        center: {
+            latitude: 45,
+            longitude: -73
+        },
+        zoom: 8
+    };
 });
