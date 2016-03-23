@@ -98,4 +98,31 @@ angular.module('starter.controllers', [])
         },
         zoom: 8
     };
+
+
+    //GESTION DE LA CARTE
+    var map;
+
+    angular.element(document).ready(function () {
+
+        var div = document.getElementById("map");
+
+        map = plugin.google.maps.Map.getMap(div);
+
+        map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
+
+    });
+
+    var onMapReady = function () {
+        var button = document.getElementById("button");
+        button.addEventListener("click", onBtnClicked, false);
+    };
+
+    var onBtnClicked = function () {
+        map.showDialog();
+    };
+
+
+
+
 });
