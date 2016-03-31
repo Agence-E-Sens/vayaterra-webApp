@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
 .controller('AppCtrl', function ($scope, $ionicModal, $timeout) {
 
@@ -109,8 +109,7 @@ angular.module('starter.controllers', [])
 
         map = plugin.google.maps.Map.getMap(div);
 
-        map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
-
+        //map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
     });
 
     var onMapReady = function () {
@@ -122,6 +121,13 @@ angular.module('starter.controllers', [])
         map.showDialog();
     };
 
+    $scope.map = {
+        center: {
+            latitude: 45,
+            longitude: -73
+        },
+        zoom: 8
+    };
 
 
 
