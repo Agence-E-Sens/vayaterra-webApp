@@ -11,6 +11,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     // Form data for the login modal
     $scope.geolocate = true;
+
     var user = $localForage.createInstance({
         name: 'userdata',
     });
@@ -33,7 +34,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     $scope.loginData = {};
 
     // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/connect.html', {
+    $ionicModal.fromTemplateUrl('templates/modals/connect.html', {
         scope: $scope
     }).then(function (modal) {
         $scope.modal = modal;
@@ -41,7 +42,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     // Triggered in the login modal to close it
     $scope.closeLogin = function () {
-       $scope.logged = true;
+        $scope.animate();
         $scope.modal.hide();
     };
 
@@ -72,7 +73,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                   $scope.userdata = data.message;
                   $scope.user.setItem('data', data.message).then(
                       function(){
-
+                          $scope.logged = true;
                           $scope.closeLogin();
                       });
               }
@@ -80,11 +81,32 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     };
 
     $scope.disconnect = function () {
-        $scope.logged = false;
         $scope.user.removeItem('data');
         $scope.userdata = null;
+        $scope.logged = false;
         $state.go('app.events');
     };
+
+    $scope.animate = function () {
+
+        var child;
+
+        button = document.getElementById('hamburger');
+
+        document.getElementById('content').classList.toggle('background--blur');
+
+        child = button.childNodes[1].classList;
+
+        if (child.contains('material-design-hamburger__icon--to-arrow')) {
+            child.remove('material-design-hamburger__icon--to-arrow');
+            child.add('material-design-hamburger__icon--from-arrow');
+        } else {
+            child.remove('material-design-hamburger__icon--from-arrow');
+            child.add('material-design-hamburger__icon--to-arrow');
+        }
+    };
+
+
 })
 
 .controller('EventsCtrl', function ($scope) {
@@ -153,7 +175,10 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             latitude: 0,
             longitude:0
         },
-        zoom: 18
+        zoom: 18,
+        options: {
+            disableDefaultUI: true
+        }
     };
 
     var posOptions = { timeout: 10000, enableHighAccuracy: false };
