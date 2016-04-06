@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-
-    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
     <title></title>
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -16,11 +16,15 @@
     <script src="lib/ionic/js/ionic.bundle.js"></script>
 
     <!--Google map for Angular-->
-    <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
+    <script src='https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyBtwtCB8BIFShMXDR1WzJdI19o-fd2RzgY'></script>
     <script src="lib/angular-google-maps/lodash.min.js"></script>
     <script src="lib/angular-google-maps/angular-simple-logger.min.js"></script>
     <script src="lib/angular-google-maps/angular-google-maps.min.js"></script>
+    <script src="lib/localforage/localforage.min.js"></script>
+    <script src="lib/localforage/angular-localForage.min.js"></script>
+    <script src="lib/jquery.js"></script>
 
+    <script src="lib/ngCordova/dist/ng-cordova.min.js"></script>
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
     <!-- your app's js -->
@@ -28,7 +32,7 @@
     <script src="js/controllers.js"></script>
 </head>
 
-<body ng-app="starter">
+<body ng-app="vayaterra">
     <ion-nav-view></ion-nav-view>
 </body>
 

@@ -1,6 +1,6 @@
-angular.module('starter.controllers', ['uiGmapgoogle-maps'])
+angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule'])
 
-.controller('AppCtrl', function ($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function ($scope, $http, $ionicModal, $localForage, $timeout, $state) {
 
     // With the new view caching in Ionic, Controllers are only called
     // when they are recreated or on app start, instead of every page change.
@@ -10,10 +10,30 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
     //});
 
     // Form data for the login modal
+    $scope.geolocate = true;
+    var user = $localForage.createInstance({
+        name: 'userdata',
+    });
+    var appdata = $localForage.createInstance({
+        name: 'appdata',
+    });
+
+    $scope.user = $localForage.instance('userdata');
+    $scope.user.getItem('data').then(function (data) {
+        if (data == null) {
+            $scope.logged = false;
+        }
+        else {
+            $scope.userdata = data;
+            $scope.logged = true;
+        }
+    });
+
+
     $scope.loginData = {};
 
     // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/login.html', {
+    $ionicModal.fromTemplateUrl('templates/connect.html', {
         scope: $scope
     }).then(function (modal) {
         $scope.modal = modal;
@@ -21,6 +41,7 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
 
     // Triggered in the login modal to close it
     $scope.closeLogin = function () {
+       $scope.logged = true;
         $scope.modal.hide();
     };
 
@@ -29,15 +50,40 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
         $scope.modal.show();
     };
 
-    // Perform the login action when the user submits the login form
+    // Soumission du formulaire de connexion
     $scope.doLogin = function () {
-        console.log('Doing login', $scope.loginData);
 
-        // Simulate a login delay. Remove this and replace with your login
-        // code if using a login system
-        $timeout(function () {
-            $scope.closeLogin();
-        }, 1000);
+        $http({
+            method: 'POST',
+            url: 'http://vayaterra.local/connect.php',
+            data: $.param($scope.loginData),  // pass in data as strings
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+
+            }  
+        })
+          .success(function (data) {
+
+              if (!data.success) {
+                  $scope.errorPasswd = data.errors.password;
+                  $scope.errorUsername = data.errors.username;
+
+              } else {
+                  //Connexion réussie
+                  $scope.userdata = data.message;
+                  $scope.user.setItem('data', data.message).then(
+                      function(){
+
+                          $scope.closeLogin();
+                      });
+              }
+          });
+    };
+
+    $scope.disconnect = function () {
+        $scope.logged = false;
+        $scope.user.removeItem('data');
+        $scope.userdata = null;
+        $state.go('app.events');
     };
 })
 
@@ -60,75 +106,86 @@ angular.module('starter.controllers', ['uiGmapgoogle-maps'])
             id: 4
         }
     ];
+
+
+    $scope.refresh = function () {
+
+        $http({
+            method: 'POST',
+            url: 'http://vayaterra.local/getEvents.php',
+            data: $.param($scope.loginData),  // pass in data as strings
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+  .success(function (data) {
+
+      if (!data.success) {
+          $scope.errorPasswd = data.errors.password;
+          $scope.errorUsername = data.errors.username;
+
+      } else {
+          //Connexion réussie
+          $scope.userdata = data.message;
+          $scope.user.setItem('data', data.message).then(
+              function () {
+
+              });
+      }
+  });
+
+    };
 })
 
-.controller('EventCtrl', function ($scope, $stateParams) {})
+.controller('ProfileCtrl', function ($scope) {
 
-.controller('MapCtrl', function ($scope) {
-    $scope.cities = [
-        {
-            title: 'Paris',
-            id: 1
-        },
-        {
-            title: 'Dublin',
-            id: 2
-        },
-        {
-            title: 'London',
-            id: 3
-        },
-        {
-            title: 'Oran',
-            id: 4
-        },
-        {
-            title: 'Tokyo',
-            id: 5
-        },
-        {
-            title: 'Washington',
-            id: 6
-        }
-    ];
+})
+
+.controller('EventCtrl', function ($scope, $stateParams) {
+
+
+})
+
+.controller('MapCtrl', function ($scope, $cordovaGeolocation, uiGmapGoogleMapApi) {
+
     $scope.map = {
-        center: {
-            latitude: 45,
-            longitude: -73
+        center : {
+            latitude: 0,
+            longitude:0
         },
-        zoom: 8
+        zoom: 18
     };
 
+    var posOptions = { timeout: 10000, enableHighAccuracy: false };
+    $cordovaGeolocation
+      .getCurrentPosition(posOptions)
+      .then(function (position) {
+          $scope.map.center.latitude = position.coords.latitude;
+          $scope.map.center.longitude = position.coords.longitude;
+      }, function (err) {
+          alert("Veuillez activer les options GPS et Réseau de votre mobile");
+      });
 
-    //GESTION DE LA CARTE
-    var map;
 
-    angular.element(document).ready(function () {
+    uiGmapGoogleMapApi.then(function (maps) {
 
-        var div = document.getElementById("map");
+        var watchOptions = {
+            timeout: 500,
+            enableHighAccuracy: false // may cause errors if true
+        };
 
-        map = plugin.google.maps.Map.getMap(div);
+        var watch = $cordovaGeolocation.watchPosition(watchOptions);
+        watch.then(
+          null,
+          function (err) {
+              alert("Veuillez activer les options GPS et Réseau de votre mobile");
+          },
+          function (position) {
+              $scope.map.center.latitude = position.coords.latitude;
+              $scope.map.center.longitude = position.coords.longitude;
+          });
 
-        //map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
+
     });
-
-    var onMapReady = function () {
-        var button = document.getElementById("button");
-        button.addEventListener("click", onBtnClicked, false);
-    };
-
-    var onBtnClicked = function () {
-        map.showDialog();
-    };
-
-    $scope.map = {
-        center: {
-            latitude: 45,
-            longitude: -73
-        },
-        zoom: 8
-    };
-
-
 
 });

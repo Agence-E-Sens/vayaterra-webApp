@@ -18,10 +18,13 @@
         </ion-header-bar>
         <ion-content>
             <ion-list>
-                <ion-item menu-close ng-click="login()">
+                <ion-item menu-close ng-hide="logged" ng-click="login()">
                     Connexion
                 </ion-item>
-                <ion-item menu-close href="#/app/project">
+                <ion-item menu-close ng-show="logged" href="#/app/profile">
+                    Profil
+                </ion-item>
+                <ion-item menu-close ng-show="logged" href="#/app/project">
                     Mon Projet
                 </ion-item>
                 <ion-item menu-close href="#/app/events">
@@ -29,6 +32,15 @@
                 </ion-item>
                 <ion-item menu-close href="#/app/map">
                     La Carte
+                </ion-item>
+                <ion-item menu-close ng-show="logged" href="#/app/alert">
+                    Mode alerte
+                </ion-item>
+                <ion-item menu-close href="#/app/settings">
+                    Paramètres
+                </ion-item>
+                <ion-item menu-close ng-show="logged" ng-click="disconnect()">
+                    Deconnexion
                 </ion-item>
             </ion-list>
         </ion-content>

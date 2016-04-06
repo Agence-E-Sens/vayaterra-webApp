@@ -1,0 +1,20 @@
+<ion-view view-title="Profil">
+    <ion-content>
+        <label class="item item-input">
+            <span class="input-label">Pseudo</span>
+            <input type="text" ng.model="userdata.login" value="{{userdata.login}}">
+        </label>
+        <label class="item item-input">
+            <span class="input-label">Nom</span>
+            <input type="text" ng.model="userdata.name" value="{{userdata.name}}">
+        </label>
+        <label class="item item-input">
+            <span class="input-label">Prénom</span>
+            <input type="text" ng.model="userdata.fname" value="{{userdata.fname}}">
+        </label>
+        <label class="item item-input">
+            <span class="input-label">Anniversaire</span>
+            <input type="date" ng.model="userdata.bdate" value="{{userdata.bdate}}">
+        </label>
+    </ion-content>
+</ion-view>

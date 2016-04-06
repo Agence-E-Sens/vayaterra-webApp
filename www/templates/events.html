@@ -4,6 +4,9 @@
             <ion-item ng-repeat="event in events" href="#/app/Events/{{event.id}}">
                 {{event.title}}
             </ion-item>
+
         </ion-list>
+        <button class="button icon ion-gear-a" ng-click="refresh"></button>
+
     </ion-content>
 </ion-view>

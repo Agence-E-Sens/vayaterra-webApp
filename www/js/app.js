@@ -2,7 +2,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers'])
+angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers'])
 
 .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -28,6 +28,16 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         abstract: true,
         templateUrl: 'templates/menu.html',
         controller: 'AppCtrl'
+        })
+
+    .state('app.profile', {
+        url: '/profile',
+        views: {
+            'menuContent': {
+                templateUrl: 'templates/profile.html',
+                controller: 'ProfileCtrl'
+            }
+        }
     })
 
     .state('app.project', {
@@ -35,6 +45,15 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         views: {
             'menuContent': {
                 templateUrl: 'templates/project.html'
+            }
+        }
+    })
+
+    .state('app.alert', {
+        url: '/alert',
+        views: {
+            'menuContent': {
+                templateUrl: 'templates/alertmode.html'
             }
         }
     })
@@ -67,7 +86,25 @@ angular.module('starter', ['ionic', 'starter.controllers'])
                 controller: 'EventCtrl'
             }
         }
+    })
+
+    .state('app.settings', {
+        url: '/settings',
+        views: {
+            'menuContent': {
+                templateUrl: 'templates/settings.html'
+            }
+        }
     });
     // if none of the above states are matched, use this as the fallback
-    $urlRouterProvider.otherwise('/app/project');
-});
+    $urlRouterProvider.otherwise('/app/events');
+})
+
+.config(function (uiGmapGoogleMapApiProvider) {
+    uiGmapGoogleMapApiProvider.configure({
+        //    key: 'your api key',
+        v: '3.20', //defaults to latest 3.X anyhow
+        libraries: 'weather,geometry,visualization'
+    });
+})
+;
