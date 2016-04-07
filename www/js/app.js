@@ -4,7 +4,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers'])
 
-.run(function ($ionicPlatform) {
+.run(function ($ionicPlatform, $localForage) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -17,6 +17,7 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers'])
             // org.apache.cordova.statusbar required
             StatusBar.styleDefault();
         }
+
     });
 })
 
@@ -60,6 +61,7 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers'])
 
     .state('app.map', {
         url: '/map',
+        cache:false,
         views: {
             'menuContent': {
                 templateUrl: 'templates/map.html',
@@ -98,6 +100,7 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers'])
     });
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/events');
+
 })
 
 .config(function (uiGmapGoogleMapApiProvider) {

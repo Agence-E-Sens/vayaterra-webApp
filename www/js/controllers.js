@@ -59,10 +59,9 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             url: 'http://vayaterra.local/connect.php',
             data: $.param($scope.loginData),  // pass in data as strings
             headers: { 'Content-Type': 'application/x-www-form-urlencoded',
-
             }  
         })
-          .success(function (data) {
+        .success(function (data) {
 
               if (!data.success) {
                   $scope.errorPasswd = data.errors.password;
@@ -75,15 +74,20 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                       function(){
                           $scope.logged = true;
                           $scope.closeLogin();
+                          $state.go('app.profile');
                       });
               }
           });
     };
 
+    //deconnexion
     $scope.disconnect = function () {
         $scope.user.removeItem('data');
         $scope.userdata = null;
         $scope.logged = false;
+        $ionicHistory.nextViewOptions({
+            historyRoot: false
+        });
         $state.go('app.events');
     };
 
@@ -106,7 +110,9 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         }
     };
 
-
+    $scope.$on('$ionicView.afterLeave', function () {
+        $scope.animate();
+    });
 })
 
 .controller('EventsCtrl', function ($scope) {
@@ -169,6 +175,10 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 })
 
 .controller('MapCtrl', function ($scope, $cordovaGeolocation, uiGmapGoogleMapApi) {
+
+    $scope.$on('$ionicView.afterLeave', function () {
+        console.log('The Watch shall stop here then');
+    });
 
     $scope.map = {
         center : {
