@@ -39,7 +39,7 @@ L'Application du Voyageur
     <splash src="resources/android/splash/drawable-port-xxhdpi-screen.png" density="port-xxhdpi" />
     <splash src="resources/android/splash/drawable-port-xxxhdpi-screen.png" density="port-xxxhdpi" />
   </platform>
-  <plugin name="plugin.google.maps" version="1.3.9" >
+  <plugin name="plugin.google.maps" version="1.3.9">
     <param name="API_KEY_FOR_ANDROID" value="AIzaSyBl12CJ70wwiAMwS-dJqWYwkR49wuisQ1U" />
   </plugin>
   <plugin name="cordova-plugin-camera" version="2.1.1" />
@@ -52,4 +52,5 @@ L'Application du Voyageur
   <plugin name="cordova-plugin-vibration" version="2.1.0" />
   <preference name="AndroidLaunchMode" value="standard" />
   <preference name="Fullscreen" value="True" />
+  <plugin name="cordova-plugin-whitelist" version="1.2.2" />
 </widget>

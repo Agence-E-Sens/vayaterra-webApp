@@ -2,7 +2,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers'])
+angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers', 'uiGmapgoogle-maps'])
 
 .run(function ($ionicPlatform, $localForage) {
     $ionicPlatform.ready(function () {
@@ -105,7 +105,7 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers'])
 
 .config(function (uiGmapGoogleMapApiProvider) {
     uiGmapGoogleMapApiProvider.configure({
-        //    key: 'your api key',
+        key: 'AIzaSyBtwtCB8BIFShMXDR1WzJdI19o-fd2RzgY',
         v: '3.20', //defaults to latest 3.X anyhow
         libraries: 'weather,geometry,visualization,places'
     });
