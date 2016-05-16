@@ -1,6 +1,6 @@
 angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule'])
 
-.controller('AppCtrl', function ($scope, $http, $ionicModal, $localForage, $timeout, $state, $ionicSideMenuDelegate) {
+.controller('AppCtrl', function ($scope, $rootScope, $http, $ionicModal, $localForage, $timeout, $state, $ionicSideMenuDelegate) {
 
     // With the new view caching in Ionic, Controllers are only called
     // when they are recreated or on app start, instead of every page change.
@@ -19,16 +19,18 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         name: 'appdata',
     });
 
-    $scope.user = $localForage.instance('userdata');
-    $scope.user.getItem('data').then(function (data) {
-        if (data == null) {
-            $scope.logged = false;
-        }
-        else {
-            $scope.userdata = data;
-            $scope.logged = true;
-        }
-    });
+    //    $rootScope.user = $localForage.instance('userdata');
+    //    $rootScope.user.getItem('data').then(function (data) {
+    //        if (data == null) {
+    //            $rootScope.logged = false;
+    //        } else {
+    //            $scope.userdata = data;
+    //            $rootScope.logged = true;
+    //        }
+    //    });
+
+    $rootScope.logged = true;
+
 
 
     $scope.loginData = {};
@@ -55,37 +57,37 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     $scope.doLogin = function () {
 
         $http({
-            method: 'POST',
-            url: 'http://vayaterra.local/connect.php',
-            data: $.param($scope.loginData),  // pass in data as strings
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-        })
-        .success(function (data) {
+                method: 'POST',
+                url: 'http://vayaterra.local/connect.php',
+                data: $.param($scope.loginData), // pass in data as strings
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            })
+            .success(function (data) {
 
-            if (!data.success) {
-                $scope.errorPasswd = data.errors.password;
-                $scope.errorUsername = data.errors.username;
+                if (!data.success) {
+                    $scope.errorPasswd = data.errors.password;
+                    $scope.errorUsername = data.errors.username;
 
-            } else {
-                //Connexion réussie
-                $scope.userdata = data.message;
-                $scope.user.setItem('data', data.message).then(
-                    function () {
-                        $scope.logged = true;
-                        $scope.closeLogin();
-                        $state.go('app.profile');
-                    });
-            }
-        });
+                } else {
+                    //Connexion rÃ©ussie
+                    $scope.userdata = data.message;
+                    $scope.user.setItem('data', data.message).then(
+                        function () {
+                            $rootScope.logged = true;
+                            $scope.closeLogin();
+                            $state.go('app.profile');
+                        });
+                }
+            });
     };
 
     //deconnexion
     $scope.disconnect = function () {
         $scope.user.removeItem('data');
         $scope.userdata = null;
-        $scope.logged = false;
+        $rootScope.logged = false;
         $ionicHistory.nextViewOptions({
             historyRoot: false
         });
@@ -103,7 +105,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
         if (!isOpen) {
             if (content.hasClass('background--blur')) content.removeClass('background--blur');
-            console.log('Menu fermé ' + isOpen);
+            console.log('Menu fermÃ© ' + isOpen);
             child.remove('material-design-hamburger__icon--to-arrow');
             child.add('material-design-hamburger__icon--from-arrow');
         } else {
@@ -115,12 +117,11 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     };
 
     $scope.$watch(function () {
-        return $ionicSideMenuDelegate.isOpenLeft();
-    },
-    function (isOpen) {
-        $scope.animate(isOpen);
-    });
-    console.log($scope.isMenuOpen);
+            return $ionicSideMenuDelegate.isOpenLeft();
+        },
+        function (isOpen) {
+            $scope.animate(isOpen);
+        });
 })
 
 .controller('EventsCtrl', function ($scope) {
@@ -146,28 +147,28 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     $scope.refresh = function () {
         $http({
-            method: 'POST',
-            url: 'http://vayaterra.local/getEvents.php',
-            data: $.param($scope.loginData),  // pass in data as strings
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-        })
-  .success(function (data) {
+                method: 'POST',
+                url: 'http://vayaterra.local/getEvents.php',
+                data: $.param($scope.loginData), // pass in data as strings
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            })
+            .success(function (data) {
 
-      if (!data.success) {
-          $scope.errorPasswd = data.errors.password;
-          $scope.errorUsername = data.errors.username;
+                if (!data.success) {
+                    $scope.errorPasswd = data.errors.password;
+                    $scope.errorUsername = data.errors.username;
 
-      } else {
-          //Connexion réussie
-          $scope.userdata = data.message;
-          $scope.user.setItem('data', data.message).then(
-              function () {
+                } else {
+                    //Connexion rÃ©ussie
+                    $scope.userdata = data.message;
+                    $scope.user.setItem('data', data.message).then(
+                        function () {
 
-              });
-      }
-  });
+                        });
+                }
+            });
 
     };
 })
@@ -181,46 +182,64 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
 })
 
-.controller('MapCtrl', function ($scope, $cordovaGeolocation, $cordovaNetwork, uiGmapGoogleMapApi) {
+.controller('MapCtrl', function ($scope, $rootScope, $cordovaGeolocation, $cordovaNetwork, uiGmapGoogleMapApi) {
+
+
+    $scope.isWatching = false;
+    $scope.notWatchin = true;
 
     $scope.tools = [
         {
             name: 'Refresh',
             cssClass: 'geoRefresh',
-            fn : 'currentPos()'
+            fn: 'currentPos()',
+            show: '',
+            hide: '',
         },
         {
             name: 'Watch',
             cssClass: 'geoWatch',
-            fn: 'watchPos()'
+            fn: 'watchPos()',
+            show: 'notWatchin',
+            hide: 'isWatching',
         },
         {
             name: 'Stop Watch',
             cssClass: 'geoWatchStop',
-            fn: 'stopWatch()'
+            fn: 'stopWatch()',
+            show: 'isWatching',
+            hide: 'notWatchin',
         },
         {
             name: 'add poi',
             cssClass: 'addPoi',
-            fn: 'addPoi()'
+            fn: 'addPoi()',
+            show: 'logged',
+            hide: '',
         },
         {
-            name: 'add poi',
+            name: 'add event',
             cssClass: 'addPoi',
-            fn: 'addPoi()'
+            fn: 'addPoi()',
+            show: 'logged',
+            hide: '',
         },
     ];
 
     $scope.logs = {
-        deviceOffline: 'Veuillez vérifier votre connexion à internet.',
-        gpsOff: 'La géolocalisation de votre téléphone est desactivée, veuillez l\'activer pour continuer.',
+        deviceOffline: 'Veuillez vÃ©rifier votre connexion Ã  internet.',
+        gpsOff: 'La gÃ©olocalisation de votre tÃ©lÃ©phone est desactivÃ©e, veuillez l\'activer pour continuer.',
         apiLoading: 'Google map api loading',
         endWatch: 'My watch ends here',
     };
 
     $scope.stopWatch = function () {
-        console.log($scope.logs.endWatch);
-        $scope.watch.clearWatch();
+        if (typeof $scope.watch != 'undefined') {
+            console.log($scope.logs.endWatch);
+            $scope.watch.clearWatch();
+            $scope.isWatching = false;
+            $scope.notWatchin = true;
+        }
     }
 
     $scope.watchPos = function () {
@@ -231,37 +250,43 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         };
 
         $scope.watch = $cordovaGeolocation.watchPosition(watchOptions);
+        $scope.isWatching = true;
+        $scope.notWatchin = false;
+
         $scope.watch.then(
-          null,
-          function (err) {
-              //if ($cordovaNetwork.isOffline)
-              //    alert($scope.logs.deviceOffline);
-              //else 
-              //    alert($scope.logs.gpsOff);
-          },
-          function (position) {
-              $scope.map.center.latitude = position.coords.latitude;
-              $scope.map.center.longitude = position.coords.longitude;
-          });
+            null,
+            function (err) {
+                //if ($cordovaNetwork.isOffline)
+                //    alert($scope.logs.deviceOffline);
+                //else
+                //    alert($scope.logs.gpsOff);
+                $scope.stopWatch;
+            },
+            function (position) {
+                $scope.map.center.latitude = position.coords.latitude;
+                $scope.map.center.longitude = position.coords.longitude;
+            });
 
 
     };
 
     $scope.currentPos = function () {
         console.log('refresh');
-        var posOptions = { timeout: 10000, enableHighAccuracy: false };
+        var posOptions = {
+            timeout: 10000,
+            enableHighAccuracy: false
+        };
         $cordovaGeolocation
-          .getCurrentPosition(posOptions)
-          .then(function (position) {
-              $scope.map.center.latitude = position.coords.latitude;
-              $scope.map.center.longitude = position.coords.longitude;
-              $scope.watchPos();
-          }, function (err) {
-              //if ($cordovaNetwork.isOffline)
-              //    alert($scope.logs.deviceOffline);
-              //else
-              //    alert($scope.logs.gpsOff);
-          });
+            .getCurrentPosition(posOptions)
+            .then(function (position) {
+                $scope.map.center.latitude = position.coords.latitude;
+                $scope.map.center.longitude = position.coords.longitude;
+            }, function (err) {
+                //if ($cordovaNetwork.isOffline)
+                //    alert($scope.logs.deviceOffline);
+                //else
+                //    alert($scope.logs.gpsOff);
+            });
 
     };
 
@@ -291,8 +316,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                     $scope.startGeo();
                 });
             });
-        }
-        else if ($cordovaNetwork.isOffline()) {
+        } else if ($cordovaNetwork.isOffline()) {
             alert($scope.logs.deviceOffline);
         }
 
@@ -305,14 +329,56 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
 
     $scope.$on('$ionicView.loaded', function () {
+
         if (typeof google === 'object' && typeof google.maps === 'object') {
             console.log("Google Map api fully loaded");
+            //alert($rootScope.logged);
             $scope.startGeo();
-        }
-        else {
+        } else {
             console.log("Google map api not loaded");
             $scope.loadApi();
         }
+        console.log('Is watching : ' + $scope.isWatching);
     });
 
-});
+})
+
+
+.controller('SafetyGeoCtrl', function ($scope, $rootScope, $cordovaGeolocation, $cordovaNetwork) {
+
+
+
+    $scope.monitoring = function () {
+
+        var watchOptions = {
+            timeout: 500,
+            enableHighAccuracy: false // may cause errors if true
+        };
+
+        $scope.watch = $cordovaGeolocation.watchPosition(watchOptions);
+
+        $scope.watch.then(
+            null,
+            function (err) {
+                //if ($cordovaNetwork.isOffline)
+                //    alert($scope.logs.deviceOffline);
+                //else
+                //    alert($scope.logs.gpsOff);
+                $scope.stopWatch;
+            },
+            function (position) {
+                var pos = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                }
+
+                $scope.geo.latitude = position.coords.latitude;
+                $scope.geo.longitude = position.coords.longitude;
+            });
+
+
+    };
+
+})
+
+;

@@ -1,7 +1,9 @@
 <ion-view view-title="Map">
     <ion-content>
-        <ul>
-            <li ng-repeat="tool in tools"><button class="{{tool.cssClass}}" ng-click="{{tool.fn}}">{{tool.name}}</button></li>
+        <ul class='map-tools'>
+            <li ng-repeat="tool in tools" ng-show="{{tool.show}}" ng-hide="{{tool.hide}}">
+                <button class="{{tool.cssClass}}" ng-click="{{tool.fn}}">{{tool.name}}</button>
+            </li>
         </ul>
         <ui-gmap-google-map center='map.center' zoom='map.zoom' options="map.options"></ui-gmap-google-map>
     </ion-content>

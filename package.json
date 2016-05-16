@@ -25,7 +25,16 @@
     "cordova-plugin-splashscreen",
     "cordova-plugin-statusbar",
     "cordova-plugin-geolocation",
-    "ionic-plugin-keyboard"
+    "ionic-plugin-keyboard",
+    "cordova-plugin-camera@2.1.1",
+    "cordova-plugin-device-orientation@1.0.2",
+    "cordova-plugin-device-motion@1.2.0",
+    "cordova-plugin-geolocation@2.1.0",
+    "cordova-plugin-splashscreen@3.1.0",
+    "cordova-plugin-network-information@1.2.0",
+    "cordova-plugin-dialogs@1.2.0",
+    "cordova-plugin-vibration@2.1.0",
+    "cordova-plugin-whitelist@1.2.2"
   ],
   "cordovaPlatforms": [
     "android"

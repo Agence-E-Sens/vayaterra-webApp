@@ -1,0 +1,18 @@
+<ion-view view-title="safetyGeo">
+    <ion-content>
+        <h1>Suivi Géolocalisé</h1>
+        <p>
+            <span>Le suivi géolocalisé permet à l'application d'envoyer régulièrement à Vayaterra votre position pour garder une trace de celle-ci lors de vos voyages. C'est une sécurité qui nous permettrait de vous retrouver au cas où vous ne nous donneriez plus signe de vie. Ces données ne seront communiquées a nulle organisation quelle qu'elle soit si ce n'est aux authorités compétentes. </span>
+        </p>
+
+        <ion-toggle ng-model="regularGeo" toggle-class="toggle-calm">Suivi géolocalisé</ion-toggle>
+        <div ng-show="lastPosition" class='row'>
+            <div class='card col'>
+                Ma dernière position
+            </div>
+            <div class='card col'>
+                {{lastPosition}}
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

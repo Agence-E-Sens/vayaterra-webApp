@@ -4,3 +4,5 @@
 node_modules/
 platforms/
 plugins/
+/hooks/
+/hooks/after_prepare/010_add_platform_class.js

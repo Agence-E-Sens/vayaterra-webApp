@@ -1,164 +1,210 @@
 /* Empty. Add your own CSS if you like */
 
-.angular-google-map-container { height:100vh; }
-
-.bubble-button{
-    display : block;
-    position : fixed;
-    top : 2vw;
-    left : 5.805555555555556vw;
-    z-index : 99;
-    width : 4vw;
-    height : 4vw;
-    color : black;
-    font-size : 5vh;
-    background-color : white;
-    border-radius : 100%;
+.angular-google-map-container {
+    height: 100vh;
 }
 
-
+.bubble-button {
+    display: block;
+    position: fixed;
+    top: 2vw;
+    left: 5.805555555555556vw;
+    z-index: 99;
+    width: 4vw;
+    height: 4vw;
+    color: black;
+    font-size: 5vh;
+    background-color: white;
+    border-radius: 100%;
+}
 
 
 /*@import url(http://fonts.googleapis.com/css?family=Roboto);*/
 
 .menu {
-    background-color : #938C8A;
+    background-color: #938C8A;
 }
 
 .background--blur {
-  z-index : 99;
--webkit-filter: blur(5px);
-filter: blur(5px);
-
+    z-index: 99;
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
 }
+
 .material-design-hamburger {
     display: block;
-    position : fixed;
-    background : none;
-    z-index : 200;
+    position: fixed;
+    background: none;
+    z-index: 200;
 }
 
 .material-design-hamburger button {
-  display: block;
-  border: none;
-  background: none;
-  outline: 0;
+    display: block;
+    border: none;
+    background: none;
+    outline: 0;
 }
 
 .material-design-hamburger__icon {
-  padding: 3rem 1rem;
-  cursor: pointer;
+    padding: 3rem 1rem;
+    cursor: pointer;
 }
 
 .material-design-hamburger__layer {
-  display: block;
-  width: 5vh;
-  height: .5vh;
-  background: #eee;
-  position: relative;
-  animation-duration: 300ms;
-  animation-timing-function: ease-in-out;
+    display: block;
+    width: 5vh;
+    height: .5vh;
+    background: #eee;
+    position: relative;
+    animation-duration: 300ms;
+    animation-timing-function: ease-in-out;
 }
 
-.material-design-hamburger__layer:before, .material-design-hamburger__layer:after {
-  display: block;
-  width: inherit;
-  height: .5vh;
-  position: absolute;
-  background: inherit;
-  left: 0;
-  content: '';
-  animation-duration: 300ms;
-  animation-timing-function: ease-in-out;
+.material-design-hamburger__layer:before,
+.material-design-hamburger__layer:after {
+    display: block;
+    width: inherit;
+    height: .5vh;
+    position: absolute;
+    background: inherit;
+    left: 0;
+    content: '';
+    animation-duration: 300ms;
+    animation-timing-function: ease-in-out;
 }
 
 .material-design-hamburger__layer:before {
-  bottom: 200%;
+    bottom: 200%;
 }
 
 .material-design-hamburger__layer:after {
-  top: 200%;
+    top: 200%;
 }
 
 .material-design-hamburger__icon--to-arrow {
-  animation-name: material-design-hamburger__icon--slide;
-  animation-fill-mode: forwards;
+    animation-name: material-design-hamburger__icon--slide;
+    animation-fill-mode: forwards;
 }
 
 .material-design-hamburger__icon--to-arrow:before {
-  animation-name: material-design-hamburger__icon--slide-before;
-  animation-fill-mode: forwards;
+    animation-name: material-design-hamburger__icon--slide-before;
+    animation-fill-mode: forwards;
 }
 
 .material-design-hamburger__icon--to-arrow:after {
-  animation-name: material-design-hamburger__icon--slide-after;
-  animation-fill-mode: forwards;
+    animation-name: material-design-hamburger__icon--slide-after;
+    animation-fill-mode: forwards;
 }
 
 .material-design-hamburger__icon--from-arrow {
-  animation-name: material-design-hamburger__icon--slide-from;
+    animation-name: material-design-hamburger__icon--slide-from;
 }
 
 .material-design-hamburger__icon--from-arrow:before {
-  animation-name: material-design-hamburger__icon--slide-before-from;
+    animation-name: material-design-hamburger__icon--slide-before-from;
 }
 
 .material-design-hamburger__icon--from-arrow:after {
-  animation-name: material-design-hamburger__icon--slide-after-from;
+    animation-name: material-design-hamburger__icon--slide-after-from;
 }
 
 @keyframes material-design-hamburger__icon--slide {
-  0% {
-  }
-  100% {
-    transform: rotate(180deg);
-  }
+    0% {}
+    100% {
+        transform: rotate(180deg);
+    }
 }
 
 @keyframes material-design-hamburger__icon--slide-before {
-  0% {
-  }
-  100% {
-    transform: rotate(45deg);
-    margin: 3% 37%;
-    width: 75%;
-  }
+    0% {}
+    100% {
+        transform: rotate(45deg);
+        margin: 3% 37%;
+        width: 75%;
+    }
 }
 
 @keyframes material-design-hamburger__icon--slide-after {
-  0% {
-  }
-  100% {
-    transform: rotate(-45deg);
-    margin: 3% 37%;
-    width: 75%;
-  }
+    0% {}
+    100% {
+        transform: rotate(-45deg);
+        margin: 3% 37%;
+        width: 75%;
+    }
 }
 
 @keyframes material-design-hamburger__icon--slide-from {
-  0% {
-    transform: rotate(-180deg);
-  }
-  100% {
-  }
+    0% {
+        transform: rotate(-180deg);
+    }
+    100% {}
 }
 
 @keyframes material-design-hamburger__icon--slide-before-from {
-  0% {
-    transform: rotate(45deg);
-    margin: 3% 37%;
-    width: 75%;
-  }
-  100% {
-  }
+    0% {
+        transform: rotate(45deg);
+        margin: 3% 37%;
+        width: 75%;
+    }
+    100% {}
 }
 
 @keyframes material-design-hamburger__icon--slide-after-from {
-  0% {
-    transform: rotate(-45deg);
-    margin: 3% 37%;
-    width: 75%;
-  }
-  100% {
-  }
+    0% {
+        transform: rotate(-45deg);
+        margin: 3% 37%;
+        width: 75%;
+    }
+    100% {}
+}
+
+.map-tools {
+    display: block;
+    position: absolute;
+    z-index: 99;
+    bottom: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.map-tools > li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: block;
+    height: 60px;
+    width: 60px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.map-tools > li > button {
+    outline: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.hide {
+    display: none;
+}
+
+a[href^="http://maps.google.com/maps"],
+a[href^="https://maps.google.com/maps"] {
+    display: none !important
+    /*
+    position: absolute !important;
+    right: 0;
+    bottom: 0;
+*/
+}
+
+.gmnoprint a,
+.gmnoprint span,
+.gm-style-cc {
+    display: none;
+}
+
+.gmnoprint div {
+    background: none !important;
 }

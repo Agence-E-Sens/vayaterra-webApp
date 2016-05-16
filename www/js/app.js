@@ -29,7 +29,7 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers', 'uiG
         abstract: true,
         templateUrl: 'templates/menu.html',
         controller: 'AppCtrl'
-        })
+    })
 
     .state('app.profile', {
         url: '/profile',
@@ -50,18 +50,20 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers', 'uiG
         }
     })
 
-    .state('app.alert', {
-        url: '/alert',
+    .state('app.safetygeo', {
+        url: '/safetygeo',
         views: {
             'menuContent': {
-                templateUrl: 'templates/alertmode.html'
+                templateUrl: 'templates/safetygeo.html',
+                controller : 'SafetyGeoCtrl'
+
             }
         }
     })
 
     .state('app.map', {
         url: '/map',
-        cache:false,
+        cache: false,
         views: {
             'menuContent': {
                 templateUrl: 'templates/map.html',
@@ -109,5 +111,4 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers', 'uiG
         v: '3.20', //defaults to latest 3.X anyhow
         libraries: 'weather,geometry,visualization,places'
     });
-})
-;
+});
