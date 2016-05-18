@@ -6,17 +6,17 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers', 'uiG
 
 .run(function ($ionicPlatform, $localForage) {
     $ionicPlatform.ready(function () {
-        // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-        // for form inputs)
-        if (window.cordova && window.cordova.plugins.Keyboard) {
-            cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-            cordova.plugins.Keyboard.disableScroll(true);
+        //// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+        //// for form inputs)
+        //if (window.cordova && window.cordova.plugins.Keyboard) {
+        //    cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        //    cordova.plugins.Keyboard.disableScroll(true);
 
-        }
-        if (window.StatusBar) {
-            // org.apache.cordova.statusbar required
-            StatusBar.styleDefault();
-        }
+        //}
+        //if (window.StatusBar) {
+        //    // org.apache.cordova.statusbar required
+        //    StatusBar.styleDefault();
+        //}
 
     });
 })
@@ -108,7 +108,7 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers', 'uiG
 .config(function (uiGmapGoogleMapApiProvider) {
     uiGmapGoogleMapApiProvider.configure({
         key: 'AIzaSyBtwtCB8BIFShMXDR1WzJdI19o-fd2RzgY',
-        v: '3.20', //defaults to latest 3.X anyhow
+        v: '3.24', //defaults to latest 3.X anyhow
         libraries: 'weather,geometry,visualization,places'
     });
 });

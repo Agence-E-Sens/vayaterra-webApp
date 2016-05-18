@@ -5,6 +5,12 @@
                 <button class="{{tool.cssClass}}" ng-click="{{tool.fn}}">{{tool.name}}</button>
             </li>
         </ul>
-        <ui-gmap-google-map center='map.center' zoom='map.zoom' options="map.options"></ui-gmap-google-map>
+        <ui-gmap-google-map center='map.center' zoom='map.zoom' options="map.options">
+
+            <ui-gmap-marker  idKey="userLocate.id" coords='userLocate.pos' options="userLocate.options">
+            </ui-gmap-marker>
+            
+
+        </ui-gmap-google-map>
     </ion-content>
 </ion-view>

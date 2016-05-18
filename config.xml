@@ -51,6 +51,7 @@ L'Application du Voyageur
   <plugin name="cordova-plugin-dialogs" version="1.2.0" />
   <plugin name="cordova-plugin-vibration" version="2.1.0" />
   <preference name="AndroidLaunchMode" value="standard" />
-  <preference name="Fullscreen" value="True" />
+  <preference name="Fullscreen" value="False" />
   <plugin name="cordova-plugin-whitelist" version="1.2.2" />
+  <preference name="Orientation" value="portrait" />
 </widget>
