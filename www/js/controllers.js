@@ -19,17 +19,15 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         name: 'appdata',
     });
 
-    //    $rootScope.user = $localForage.instance('userdata');
-    //    $rootScope.user.getItem('data').then(function (data) {
-    //        if (data == null) {
-    //            $rootScope.logged = false;
-    //        } else {
-    //            $scope.userdata = data;
-    //            $rootScope.logged = true;
-    //        }
-    //    });
-
-    $rootScope.logged = true;
+    $rootScope.user = $localForage.instance('userdata');
+    $rootScope.user.getItem('data').then(function (data) {
+        if (data == null) {
+            $rootScope.logged = false;
+        } else {
+            $scope.userdata = data;
+            $rootScope.logged = true;
+        }
+    });
 
 
 
@@ -182,12 +180,13 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
 })
 
-.controller('MapCtrl', function ($scope, $rootScope, $cordovaGeolocation, $cordovaNetwork,$cordovaDeviceOrientation,  uiGmapGoogleMapApi) {
+.controller('MapCtrl', function ($scope, $rootScope, $ionicModal, $cordovaGeolocation, $cordovaNetwork, $cordovaDeviceOrientation, $localForage, uiGmapGoogleMapApi) {
 
-
+    //Variables booléenne permettant l'activation des bouton watch /stop watch
     $scope.isWatching = false;
     $scope.notWatchin = true;
 
+    //Tableau des boutons de la carte (ex : watch actualiser etc...)
     $scope.tools = [
         {
             name: 'Refresh',
@@ -226,6 +225,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         },
     ];
 
+    //initialisation des paramètres de la carte
     $scope.map = {
         id: 1,
         center: {
@@ -238,26 +238,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         }
     };
 
-    $scope.defaultMarker = function(){
-         $scope.userLocate = {
-        id: 1,
-        pos: {
-            latitude: 0,
-            longitude: 0
-        },
-        options : {
-            icon: {
-                path : google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: 5,
-                rotation : 0,
-            }
-        }
-        
-    };
-    };
-   
-
-
+    //Messages des variables de logs
     $scope.logs = {
         deviceOffline: 'Veuillez vérifier votre connexion à internet.',
         gpsOff: 'La géolocalisation de votre téléphone est desactivée, veuillez l\'activer pour continuer.',
@@ -265,7 +246,69 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         endWatch: 'My watch ends here',
     };
 
+    //___________________________________________________________________________
+    // Les points d'intérêt
+    //___________________________________________________________________________
 
+    $scope.getPoi = function () {
+
+    };
+    $scope.addPoi = function () {
+
+    };
+    $scope.updatePoi = function () {
+
+    };
+    $scope.listPoi = function () {
+
+    };
+    $scope.openPoiUI = function () {
+
+    };
+
+    // Creation du modal de la fenêtre des point d'interêt
+    $ionicModal.fromTemplateUrl('templates/modals/connect.html', {
+        scope: $scope
+    }).then(function (modal) {
+        $scope.modal = modal;
+    });
+
+    // Triggered in the login modal to close it
+    $scope.closeLogin = function () {
+        $scope.animate();
+        $scope.modal.hide();
+    };
+
+    // Open the login modal
+    $scope.login = function () {
+        $scope.modal.show();
+    };
+
+
+    //___________________________________________________________________________
+    //Fonctions boussole, permettent de determiner la direction de l'utilisateur
+    //___________________________________________________________________________
+
+    //initialisation des paramètres du marqueur de l'utilisateur
+    $scope.defaultMarker = function () {
+        $scope.userLocate = {
+            id: 1,
+            pos: {
+                latitude: 0,
+                longitude: 0
+            },
+            options: {
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    scale: 5,
+                    rotation: 0,
+                }
+            }
+
+        };
+    };
+
+    //Retourne la dernière direction pointé par l'utilisateur
     $scope.currentHeading = function () {
 
         $cordovaDeviceOrientation
@@ -280,6 +323,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             });
     };
 
+    //Retourne en temps réel la direction pointée par l'utilisateur
     $scope.watchHeading = function () {
 
         console.log("let's start the watch");
@@ -299,28 +343,47 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             })
     };
 
+    //stope le suivi en temps réel
     $scope.stopWatchHeading = function () {
         $scope.watchdirection.clearWatch();
     }
 
-    $scope.stopWatch = function () {
-        if (typeof $scope.watch != 'undefined') {
-            //console.log($scope.logs.endWatch);  
-            $scope.watch.clearWatch();
-            $scope.stopWatchHeading();
-            $scope.isWatching = false;
-            $scope.notWatchin = true;
-        }
-    }
+    //___________________________________________________________________________
+    //Fonctions géolocalisation
+    //___________________________________________________________________________
 
+    //Fonction de suivi géolocalisé, met à jour la carte avec les dernières infos de l'utilisateur
+    $scope.currentPos = function () {
+        $scope.currentHeading();
+        var posOptions = {
+            timeout: 10000,
+            enableHighAccuracy: false
+        };
+        $cordovaGeolocation
+            .getCurrentPosition(posOptions)
+            .then(function (position) {
+                //On actualise la position de l'utilisateur
+                $scope.userLocate.pos.latitude = position.coords.latitude;
+                $scope.userLocate.pos.longitude = position.coords.longitude;
+                //On actualise le centre de la carte
+                $scope.map.center.latitude = position.coords.latitude;
+                $scope.map.center.longitude = position.coords.longitude;
+            }, function (err) {
+                //if ($cordovaNetwork.isOffline)
+                //    alert($scope.logs.deviceOffline);
+                //else
+                //    alert($scope.logs.gpsOff);
+            });
+    };
+
+    //Fonction de suivi géolocalisé, met à jour les infos sur la carte en temps réel
     $scope.watchPos = function () {
 
+        $scope.watchHeading();
         var watchOptions = {
-            timeout: 500,
+            timeout: 100,
             enableHighAccuracy: false // may cause errors if true
         };
-
-        $scope.watchHeading();
         $scope.watch = $cordovaGeolocation.watchPosition(watchOptions);
         $scope.isWatching = true;
         $scope.notWatchin = false;
@@ -332,80 +395,65 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 //    alert($scope.logs.deviceOffline);
                 //else
                 //    alert($scope.logs.gpsOff);
-                $scope.stopWatch;
+                $scope.stopWatch();
             },
             function (position) {
+                //On actualise la position de l'utilisateur
                 $scope.userLocate.pos.latitude = position.coords.latitude;
-                $scope.map.center.latitude = position.coords.latitude;
                 $scope.userLocate.pos.longitude = position.coords.longitude;
-                $scope.map.center.longitude = position.coords.longitude;
-            });
-
-
-    };
-
-    $scope.currentPos = function () {
-        //console.log('refresh');
-        $scope.currentHeading();
-        var posOptions = {
-            timeout: 10000,
-            enableHighAccuracy: false
-        };
-        $cordovaGeolocation
-            .getCurrentPosition(posOptions)
-            .then(function (position) {
-                $scope.userLocate.pos.latitude = position.coords.latitude;
+                //On actualise le centre de la carte
                 $scope.map.center.latitude = position.coords.latitude;
-                $scope.userLocate.pos.longitude = position.coords.longitude;
                 $scope.map.center.longitude = position.coords.longitude;
-
-            }, function (err) {
-                //if ($cordovaNetwork.isOffline)
-                //    alert($scope.logs.deviceOffline);
-                //else
-                //    alert($scope.logs.gpsOff);
             });
     };
 
+    //Stope le suivi en temps réel
+    $scope.stopWatch = function () {
+        if (typeof $scope.watch != 'undefined') {
+            //On clear la session de suivi géolocalisé
+            $scope.watch.clearWatch();
+            //On clear la session de suivi de direction  
+            $scope.stopWatchHeading();
+            $scope.isWatching = false;
+            $scope.notWatchin = true;
+        }
+    }
+
+    //Fonction d'initialisation de la carte
     $scope.startGeo = function () {
-
-        //console.log("Api Loaded");
         $scope.defaultMarker();
         $scope.currentPos();
     };
 
+    //___________________________________________________________________________
+    // Les évènements et les fonctions associées
+    //___________________________________________________________________________
+
+    //On charge l'api Gmap, on attend la fin de son chargement
     $scope.loadApi = function () {
         if ($cordovaNetwork.isOnline()) {
-
-                uiGmapGoogleMapApi.then(function (maps) {
-                    $scope.startGeo();
-                });
-
-        } else if ($cordovaNetwork.isOffline()) {
+            uiGmapGoogleMapApi.then(function (maps) {
+                $scope.startGeo();
+            });
+        }
+        else if ($cordovaNetwork.isOffline()) {
             alert($scope.logs.deviceOffline);
         }
-
-
-
     };
 
-
+    //On quitte la vue donc on arrete la surveillance google map
     $scope.$on('$ionicView.afterLeave', function () {
         $scope.stopWatch();
     });
 
-
+    //On vérifie que l'api est chargée
     $scope.$on('$ionicView.loaded', function () {
 
         if (typeof google === 'object' && typeof google.maps === 'object') {
-            //console.log("Google Map api fully loaded");
-            //alert($rootScope.logged);
             $scope.startGeo();
         } else {
-            //console.log("Google map api not loaded");
             $scope.loadApi();
         }
-        //console.log('Is watching : ' + $scope.isWatching);
     });
 
 })

@@ -109,6 +109,6 @@ angular.module('vayaterra', ['ionic', 'ngCordova', 'vayaterra.controllers', 'uiG
     uiGmapGoogleMapApiProvider.configure({
         key: 'AIzaSyBtwtCB8BIFShMXDR1WzJdI19o-fd2RzgY',
         v: '3.24', //defaults to latest 3.X anyhow
-        libraries: 'weather,geometry,visualization,places'
+        libraries: 'places'
     });
 });
