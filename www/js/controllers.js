@@ -19,8 +19,8 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         name: 'appdata',
     });
 
-    $rootScope.user = $localForage.instance('userdata');
-    $rootScope.user.getItem('data').then(function (data) {
+    $scope.user = $localForage.instance('userdata');
+    $scope.user.getItem('data').then(function (data) {
         if (data == null) {
             $rootScope.logged = false;
         } else {
@@ -223,6 +223,13 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             show: 'logged',
             hide: '',
         },
+        {
+            name: 'update poi',
+            cssClass: 'addPoi',
+            fn: 'updatePoi()',
+            show: '',
+            hide: '',
+        },
     ];
 
     //initialisation des paramètres de la carte
@@ -250,38 +257,97 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     // Les points d'intérêt
     //___________________________________________________________________________
 
+
+    //Récuperation de l'instance de stockage local liée au données de l'application
+
+    $scope.appdata = $localForage.instance('appdata');
+
+    //Fonction qui récupère les données liées aux points d'interêt de la carte
     $scope.getPoi = function () {
 
+        $scope.appdata.getItem('poiList').then(function (data) {
+            $scope.poilist = JSON.parse(data);
+            console.log($scope.poilist);
+
+        });
     };
+
+    //Fonction qui récupère les données distantes liées aux points d'interêt de la carte
+    $scope.getPoiDist = function () {
+
+        $scope.appdata.getItem('poiList').then(function (data) {
+            $scope.poilist = JSON.parse(data);
+            console.log($scope.poilist);
+
+        });
+    };
+
+    //Fonction qui place les marqueurs des points d'intêrets
+    $scope.MarkPoi = function () {
+
+    };
+
+    $scope.updatePoi = function () {
+        $scope.poilist = [
+            {
+                id: 1,
+                title: 'La tradition',
+                typeP: 'boutique',
+                privacy: 'public',
+                latitude: 48.773121,
+                longitude: 1.987218
+            }, {
+                id: 2,
+                title: 'Home Sweet Home',
+                typeP: 'autre',
+                privacy: 'private',
+                latitude: 48.772863,
+                longitude: 1.986254
+            }, {
+                id: 3,
+                title: 'Parc',
+                typeP: 'parc',
+                privacy: 'public',
+                latitude: 48.772958,
+                longitude: 1.985654
+            },
+        ];
+
+        var encoding = JSON.stringify($scope.poilist);
+        $scope.appdata.setItem('poiList', encoding);
+
+        console.log('poilist updated')
+    };
+
     $scope.addPoi = function () {
 
-    };
-    $scope.updatePoi = function () {
+        var poi = {
+            name: $scope.poiName,
+            type: $scope.poiType,
+            privacy: $scope.poiPrivacy,
+        }
 
     };
-    $scope.listPoi = function () {
 
-    };
     $scope.openPoiUI = function () {
 
     };
 
     // Creation du modal de la fenêtre des point d'interêt
-    $ionicModal.fromTemplateUrl('templates/modals/connect.html', {
+    $ionicModal.fromTemplateUrl('templates/modals/DetailPOI.html', {
         scope: $scope
-    }).then(function (modal) {
-        $scope.modal = modal;
+    }).then(function (POI) {
+        $scope.POI = POI;
     });
 
     // Triggered in the login modal to close it
-    $scope.closeLogin = function () {
-        $scope.animate();
-        $scope.modal.hide();
+    $scope.closePoi = function () {
+        $scope.POI.hide();
     };
 
     // Open the login modal
-    $scope.login = function () {
-        $scope.modal.show();
+    $scope.OpenPoi = function () {
+        $scope.POI.show();
     };
 
 
@@ -292,7 +358,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     //initialisation des paramètres du marqueur de l'utilisateur
     $scope.defaultMarker = function () {
         $scope.userLocate = {
-            id: 1,
+            id: 999,
             pos: {
                 latitude: 0,
                 longitude: 0
@@ -421,6 +487,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     //Fonction d'initialisation de la carte
     $scope.startGeo = function () {
+        $scope.getPoi();
         $scope.defaultMarker();
         $scope.currentPos();
     };
