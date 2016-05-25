@@ -7,6 +7,12 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 }
 
 
+	# appel SPIP
+
+	include ('sha256.inc.php');
+
+
+
 $errors = array();  // array to hold validation errors
 $data = array();        // array to pass back data
 
@@ -24,27 +30,32 @@ if (!empty($errors)) {
   // if there are items in our errors array, return those errors
   $data['success'] = false;
   $data['errors']  = $errors;
-} else {
+} 
 
-    $db = mysqli_connect('localhost', 'root', '', 'test') or die(mysqli_error($db));
-    mysqli_query($db,"SET NAMES UTF8") or die(mysqli_error($db));
-
-    $srcLog = "SELECT * FROM `user` WHERE `login`='{$_POST['username']}'";
+else {
+    
+	include('mysql_connect.php');
+    
+    //TEST User existant 
+    $login = $_POST['username'];
+    $pass = $_POST['password'];
+    $srcLog = "SELECT `alea_actuel` FROM `spip_auteurs` WHERE `login`='$login'";
     $logQuery = mysqli_query($db,$srcLog);
 
     if(mysqli_num_rows($logQuery)){
 
-        $req = "SELECT `login`,`name`,`fname`,`bdate` FROM `user` WHERE `login`='{$_POST['username']}' AND `passwd`='{$_POST['password']}'";
-        $res = mysqli_query($db,$req);
-
-        if(mysqli_num_rows($res)){
-            $res = mysqli_fetch_assoc($res);
+        $result = mysqli_fetch_assoc($logQuery);
+        $crypted = sha256($result['alea_actuel'].$pass);
+        
+        $srcLog = "SELECT `nom`, `email`, `login`,`id_auteur` FROM `spip_auteurs` WHERE `login`='$login' AND `pass`='$crypted'";
+        $logQuery = mysqli_query($db,$srcLog);
+        
+        if(mysqli_num_rows($logQuery)){
             // if there are no errors, return a message
-            $data['message'] = $res;
+            $data['message'] = mysqli_fetch_assoc($logQuery);
         }
-
         else{
-            $errors['connexion'] = 'Connexion failed.';
+            $errors['connexion'] = 'Connexion failed. Wrong password';
         }
     }
     else{
@@ -62,5 +73,3 @@ if (!empty($errors)) {
 
 // return all our data to an AJAX call
 echo json_encode($data);
-
-

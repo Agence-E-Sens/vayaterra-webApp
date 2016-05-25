@@ -1,6 +1,6 @@
 angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule'])
 
-.controller('AppCtrl', function ($scope, $rootScope, $http, $ionicModal, $localForage, $timeout, $state, $ionicSideMenuDelegate) {
+.controller('AppCtrl', function ($scope, $rootScope, $http, $ionicModal, $localForage, $timeout, $state, $ionicSideMenuDelegate, $ionicHistory) {
 
     // With the new view caching in Ionic, Controllers are only called
     // when they are recreated or on app start, instead of every page change.
@@ -63,10 +63,9 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             }
         })
             .success(function (data) {
-
                 if (!data.success) {
-                    $scope.errorPasswd = data.errors.password;
-                    $scope.errorUsername = data.errors.username;
+                    $scope.errorPasswd = ((data.errors.password) ? data.errors.password : false);
+                    $scope.errorUsername = ((data.errors.username) ? data.errors.username : false);
 
                 } else {
                     //Connexion réussie
@@ -182,6 +181,15 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
 .controller('MapCtrl', function ($scope, $rootScope, $ionicModal, $cordovaGeolocation, $cordovaNetwork, $cordovaDeviceOrientation, $localForage, uiGmapGoogleMapApi) {
 
+    //USER DATA
+
+    $scope.user = $localForage.instance('userdata');
+    $scope.user.getItem('data').then(function (data) {
+        $scope.userdata = data;
+        console.log(data);
+    });
+
+
     //Variables booléenne permettant l'activation des bouton watch /stop watch
     $scope.isWatching = false;
     $scope.notWatchin = true;
@@ -264,22 +272,38 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     //Fonction qui récupère les données liées aux points d'interêt de la carte
     $scope.getPoi = function () {
-
         $scope.appdata.getItem('poiList').then(function (data) {
             $scope.poilist = JSON.parse(data);
             console.log($scope.poilist);
-
         });
     };
 
     //Fonction qui récupère les données distantes liées aux points d'interêt de la carte
     $scope.getPoiDist = function () {
+        var allorpublic = ((typeof $scope.userdata.id_auteur != undefined) ? $scope.userdata.id_auteur : false);
+        $http({
+            method: 'POST',
+            url: 'http://vayaterra.local/poi.php?getPOI=true',
+            data: $.param(allorpublic), // pass in data as strings
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+            .success(function (data) {
 
-        $scope.appdata.getItem('poiList').then(function (data) {
-            $scope.poilist = JSON.parse(data);
-            console.log($scope.poilist);
+                if (!data.success) {
+                    $scope.errorPasswd = data.errors.password;
+                    $scope.errorUsername = data.errors.username;
 
-        });
+                } else {
+                    //Connexion réussie
+                    $scope.userdata = data.message;
+                    $scope.user.setItem('data', data.message).then(
+                        function () {
+
+                        });
+                }
+            });
     };
 
     //Fonction qui place les marqueurs des points d'intêrets
@@ -288,30 +312,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     };
 
     $scope.updatePoi = function () {
-        $scope.poilist = [
-            {
-                id: 1,
-                title: 'La tradition',
-                typeP: 'boutique',
-                privacy: 'public',
-                latitude: 48.773121,
-                longitude: 1.987218
-            }, {
-                id: 2,
-                title: 'Home Sweet Home',
-                typeP: 'autre',
-                privacy: 'private',
-                latitude: 48.772863,
-                longitude: 1.986254
-            }, {
-                id: 3,
-                title: 'Parc',
-                typeP: 'parc',
-                privacy: 'public',
-                latitude: 48.772958,
-                longitude: 1.985654
-            },
-        ];
+        $scope.poilist = [];
 
         var encoding = JSON.stringify($scope.poilist);
         $scope.appdata.setItem('poiList', encoding);
