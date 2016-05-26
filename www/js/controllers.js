@@ -53,7 +53,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     // Soumission du formulaire de connexion
     $scope.doLogin = function () {
-
         $http({
             method: 'POST',
             url: 'http://vayaterra.local/connect.php',
@@ -179,7 +178,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
 })
 
-.controller('MapCtrl', function ($scope, $rootScope, $ionicModal, $cordovaGeolocation, $cordovaNetwork, $cordovaDeviceOrientation, $localForage, uiGmapGoogleMapApi) {
+.controller('MapCtrl', function ($scope,$http, $rootScope, $ionicModal, $cordovaGeolocation, $cordovaNetwork, $cordovaDeviceOrientation, $localForage, uiGmapGoogleMapApi) {
 
     //USER DATA
 
@@ -270,54 +269,55 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     $scope.appdata = $localForage.instance('appdata');
 
-    //Fonction qui récupère les données liées aux points d'interêt de la carte
-    $scope.getPoi = function () {
+    //Fonction qui initialise les données liées aux points d'interêt de la carte
+    $scope.startPoi = function () {
         $scope.appdata.getItem('poiList').then(function (data) {
             $scope.poilist = JSON.parse(data);
-            console.log($scope.poilist);
+            if (typeof $scope.poilist != null && typeof $scope.poilist != null){
+                MarkPoi()
+                getPoiDist();
+            }
+            else getPoiDist(startPoi());
         });
     };
 
     //Fonction qui récupère les données distantes liées aux points d'interêt de la carte
-    $scope.getPoiDist = function () {
-        var allorpublic = ((typeof $scope.userdata.id_auteur != undefined) ? $scope.userdata.id_auteur : false);
+    var getPoiDist = function (callback) {
+        var post = {};
+        post.getPoi = true;
+        post.allorpublic = ((typeof $scope.userdata.id_auteur != undefined) ? $scope.userdata.id_auteur : false);
+        console.log($.param(post));
         $http({
             method: 'POST',
-            url: 'http://vayaterra.local/poi.php?getPOI=true',
-            data: $.param(allorpublic), // pass in data as strings
+            url: 'http://vayaterra.local/poi.php',
+            data: $.param(post), // pass in data as strings
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             }
-        })
-            .success(function (data) {
-
-                if (!data.success) {
-                    $scope.errorPasswd = data.errors.password;
-                    $scope.errorUsername = data.errors.username;
-
-                } else {
-                    //Connexion réussie
-                    $scope.userdata = data.message;
-                    $scope.user.setItem('data', data.message).then(
-                        function () {
-
-                        });
-                }
-            });
+        }).success(function (data) {
+            if (!data.success) {
+                console.log(data);
+            } else {
+                updatePoi(data.data,callback);
+            }
+        });
     };
 
     //Fonction qui place les marqueurs des points d'intêrets
-    $scope.MarkPoi = function () {
-
+    var MarkPoi = function () {
+        angular.element(document.getElementById('map')).append("<ui-gmap-markers models='poilist' idKey='poilist.id' coords=\"'self'\"></ui-gmap-markers>");
+        console.log('markpoi');
+        console.log($scope.poilist);
     };
 
-    $scope.updatePoi = function () {
-        $scope.poilist = [];
+    var updatePoi = function (data,callback) {
 
-        var encoding = JSON.stringify($scope.poilist);
-        $scope.appdata.setItem('poiList', encoding);
+        $scope.poilist = data;
+        var encPoiLi = JSON.stringify($scope.poilist);
+        $scope.appdata.setItem('poiList', encPoiLi).then(callback);
 
         console.log('poilist updated')
+        console.log($scope.poilist)
     };
 
     $scope.addPoi = function () {
@@ -488,7 +488,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     //Fonction d'initialisation de la carte
     $scope.startGeo = function () {
-        $scope.getPoi();
+        $scope.startPoi();
         $scope.defaultMarker();
         $scope.currentPos();
     };

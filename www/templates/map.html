@@ -5,11 +5,10 @@
                 <button class="{{tool.cssClass}}" ng-click="{{tool.fn}}">{{tool.name}}</button>
             </li>
         </ul>
-        <ui-gmap-google-map center='map.center' zoom='map.zoom' options="map.options">
+        <ui-gmap-google-map id='center='map.center' zoom='map.zoom' options="map.options">
 
             <ui-gmap-marker  idKey="userLocate.id" coords='userLocate.pos' options="userLocate.options"></ui-gmap-marker>
-            <ui-gmap-markers models="poilist" idKey='poilist.id' coords="'self'">
-            </ui-gmap-markers>
+            
 
         </ui-gmap-google-map>
     </ion-content>

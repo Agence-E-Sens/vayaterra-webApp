@@ -1,15 +1,11 @@
 <?php
 
-if (isset($_SERVER['HTTP_ORIGIN'])) {
-    header("Access-Control-Allow-Origin: *");
-    header('Access-Control-Allow-Credentials: true');
-    header('Access-Control-Max-Age: 86400');    // cache for 1 day
-}
 
 
 	# appel SPIP
 
-	include ('sha256.inc.php');
+include ('sha256.inc.php');
+include ('mysql_connect.php');
 
 
 
@@ -30,13 +26,13 @@ if (!empty($errors)) {
   // if there are items in our errors array, return those errors
   $data['success'] = false;
   $data['errors']  = $errors;
-} 
+}
 
 else {
-    
+
 	include('mysql_connect.php');
-    
-    //TEST User existant 
+
+    //TEST User existant
     $login = $_POST['username'];
     $pass = $_POST['password'];
     $srcLog = "SELECT `alea_actuel` FROM `spip_auteurs` WHERE `login`='$login'";
@@ -46,10 +42,10 @@ else {
 
         $result = mysqli_fetch_assoc($logQuery);
         $crypted = sha256($result['alea_actuel'].$pass);
-        
+
         $srcLog = "SELECT `nom`, `email`, `login`,`id_auteur` FROM `spip_auteurs` WHERE `login`='$login' AND `pass`='$crypted'";
         $logQuery = mysqli_query($db,$srcLog);
-        
+
         if(mysqli_num_rows($logQuery)){
             // if there are no errors, return a message
             $data['message'] = mysqli_fetch_assoc($logQuery);
