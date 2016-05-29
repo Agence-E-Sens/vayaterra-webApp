@@ -161,7 +161,7 @@
 .map-tools {
     display: block;
     position: absolute;
-    z-index: 99;
+    z-index: 99999999999;
     bottom: 0;
     left: 0;
     padding: 0;
@@ -169,6 +169,8 @@
 }
 
 .map-tools > li {
+        z-index: 999999999999999999;
+
     padding: 0;
     margin: 0;
     list-style: none;
@@ -180,6 +182,8 @@
 }
 
 .map-tools > li > button {
+            z-index: 999999999999999999999;
+
     outline: 0;
     height: 100%;
     width: 100%;
@@ -207,4 +211,15 @@ a[href^="https://maps.google.com/maps"] {
 
 .gmnoprint div {
     background: none !important;
+}
+
+
+
+
+
+.modalPOI{
+    width : calc(100% - 60px);
+    height: 50%;
+    left :60px;
+    top : 50%;
 }
