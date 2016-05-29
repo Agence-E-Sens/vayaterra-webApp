@@ -1,6 +1,6 @@
 angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule'])
 
-.controller('AppCtrl', function ($scope, $rootScope, $http, $ionicModal, $localForage, $timeout, $state, $ionicSideMenuDelegate, $ionicHistory) {
+.controller('AppCtrl', function ($scope, $rootScope, $http, $ionicModal, $localForage, $timeout, $state, $ionicSideMenuDelegate, $ionicHistory, $cordovaGeolocation) {
 
     // With the new view caching in Ionic, Controllers are only called
     // when they are recreated or on app start, instead of every page change.
@@ -19,14 +19,22 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         name: 'appdata',
     });
 
-    $scope.user = $localForage.instance('userdata');
-    $scope.user.getItem('data').then(function (data) {
+
+    //Récuperation de l'instance de stockage local liée au données de l'utilisateur
+    $rootScope.user = $localForage.instance('userdata');
+
+    //Récuperation de l'instance de stockage local liée au données de l'application
+    $rootScope.appdata = $localForage.instance('appdata');
+
+    $rootScope.user.getItem('data').then(function (data) {
         if (data === null) {
-            $rootScope.logged = false;
+            $rootScope.userdata = {
+                logged: false,
+            };
         } else {
-            data.logged = true;
-            $scope.userdata = data;
-            $rootScope.logged = true;
+            $rootScope.userdata = data;
+            $rootScope.userdata.logged = true;
+            $rootScope.recordLocation();
         }
     });
 
@@ -69,25 +77,17 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
                 } else {
                     //Connexion réussie
+                    data.message.shareLoc = (($rootScope.userdata.shareLoc === undefined) ? true : $rootScope.userdata.shareLoc);
+                    data.message.safetyLoc = (($rootScope.userdata.safetyLoc === undefined) ? false : $rootScope.userdata.safetyLoc);
+                    data.userdata.logged = true;
+                    $rootScope.userdata = data.message;
 
-                    $scope.user.getItem('data').then(function (storeddata) {
-                        console.log(storeddata);
-                        if ( storeddata !== null && storeddata.shareLoc != 'undefined' && storeddata.shareLoc != null && storeddata.id_auteur == data.message.id_auteur) {
-                            data.message.shareLoc = storeddata.shareLoc;
-                        }
-                        else {
-                            data.message.shareLoc = true;
-                        }
-
-                        $scope.userdata = data.message;
-                        $scope.user.setItem('data', data.message).then(function () {
-                            $rootScope.logged = true;
-                            $scope.closeLogin();
-                            $state.go('app.profile');
-                            console.log(data.message);
-                        });
-
+                    $rootScope.user.setItem('data', data.message).then(function () {
+                        $scope.closeLogin();
+                        $state.go('app.profile');
+                        $rootScope.recordLocation();
                     });
+
                 }
             });
     };
@@ -95,18 +95,21 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     //deconnexion
     $scope.disconnect = function () {
         //$scope.user.removeItem('data');
-        //$scope.userdata = null;
-        $scope.userdata.logged = false;
-        $scope.user.setItem('data', $scope.userdata).then(function () {
-            $rootScope.logged = false;
+        //$rootScope.userdata = null;
+        $rootScope.userdata.logged = false;
+        $rootScope.user.setItem('data', $rootScope.userdata).then(function () {
+            $rootScope.userdata.logged = false;
             $ionicHistory.nextViewOptions({
                 historyRoot: false
             });
             $state.go('app.events');
+            $rootScope.recordLocation();
         })
 
 
     };
+
+    //Anime l'icone hamburger du menu et floute le contenu
 
     $scope.animate = function (isOpen) {
 
@@ -137,12 +140,36 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             $scope.animate(isOpen);
         });
 
+    // FOnctions qui permettent de mettre en forme la date et l'heure.
+    var addZero = function (i) {
+        if (i < 10) {
+            i = "0" + i;
+        }
+        return i;
+    }
 
-    $rootScope.fivelastpos = {};
+    var getTime = function () {
+        var d = new Date();
+        var h = addZero(d.getHours());
+        var m = addZero(d.getMinutes());
+        var s = addZero(d.getSeconds());
+        return h + ":" + m + ":" + s;
+    }
 
-    $rootScope.recordLocation = function () {
+    var getDate = function () {
+        var date = new Date();
+        var day = ("0" + date.getDate()).slice(-2);
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+        var dateP = date.getFullYear() + '-' + month + '-' + day;
+
+        return dateP;
+    }
+
+    //Fonction qui permet de lancer la géolocalisation de fond
+    $rootScope.SGLWatch = function () {
+        $rootScope.fivelastpos = [];
         var watchOptions = {
-            timeout: 4000,
+            timeout: 1000,
             enableHighAccuracy: false // may cause errors if true
         };
         $rootScope.SGL = $cordovaGeolocation.watchPosition(watchOptions);
@@ -153,61 +180,112 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 //    alert($scope.logs.deviceOffline);
                 //else
                 //    alert($scope.logs.gpsOff);
-                $scope.stopWatch();
+                $rootScope.SGLStop($rootScope.SGLWatch);
             },
             function (position) {
-                var date = new Date();
-                var day = ("0" + date.getDate()).slice(-2);
-                var month = ("0" + (date.getMonth() + 1)).slice(-2);
-                var dateP = date.getFullYear() + '-' + month + '-' + day;
+                //console.log('new pos');
+                //console.log($rootScope.fivelastpos.length);
 
                 var pos = {
                     latitude: position.coords.latitude,
                     longitude: position.coords.latitude,
-                    date : date
+                    date: getDate(),
+                    heure: getTime()
                 }
-                $rootScope.fivelastpos.push(pos);
-                if ($rootScope.fivelastpos.length === 5) {
+
+                $rootScope.fivelastpos[$rootScope.fivelastpos.length] = pos;
+                if ($rootScope.fivelastpos !== null && $rootScope.fivelastpos.length === 5) {
                     $rootScope.sendSGL();
                 }
             });
+    }
+
+    //Fonction qui permet de stopper la géolocalisation de fond 
+    $rootScope.SGLStop = function (callback) {
+        $rootScope.SGL.clearWatch();
+        $rootScope.sendSGL();
+        callback;
+    }
+
+    //Fonction qui permet d'évaluer différentes conditions pour lancer ou stopper la géolocalisation de fond.
+    $rootScope.recordLocation = function () {
+
+        console.log('recordlocation');
+        if ($rootScope.userdata.logged) {
+            //On check si l'utilisateur est connecté
+            if ($rootScope.userdata.shareLoc || $rootScope.userdata.safetyLoc) {
+                //On vérifie si l'utilisateur a choisi de partager sa position ou s'il a activé le mode suivi géolocalisé
+                if ($rootScope.SGL) {
+                    //On vérifié que celle ci n'ést pas déjà lancée
+                    console.log('Already monitoring your location');
+                }
+                else {
+                    //Sinon on lance la fonction
+                    console.log('Launching the monitoring function');
+                    $rootScope.SGLWatch();
+                }
+            }
+            else {
+                //L'utilisateur a décidé de ne pas partager sa position
+                console.log('User has disabled the monitoring function');
+                if ($rootScope.SGL) {
+                    //On vérifie qu'il n'y plus de surveillance, sinon on désactive
+                    console.log('Because the user has shutdown the monitoring function, we must stop the watch');
+                    $rootScope.SGLStop();
+                }
+            }
+        }
+        else if ($rootScope.SGL) {
+            //SI l'utilisateur n'est pas connecté on vérifie que la fonction ne tourne pas en fond
+            //Si oui on la stop   
+            console.log('The user is disconnected, no need to monitor his location');
+            $rootScope.SGLStop();
+        }
+        else {
+            //L'utilisateur est déconnecté et la fonction ne tourne pas
+            console.log('Désactivé')
+        }
     };
+
+       //Fonction d'envoi des données de géolocalisation
     $rootScope.sendSGL = function () {
-        
+
+
+        var positions = $rootScope.fivelastpos;
+        $rootScope.fivelastpos = [];
+        var post = {
+            positions: positions,
+            storingLoc: true,
+            id_voyageur: $rootScope.userdata.id_auteur
+        };
+
+        //On ajoute les nouvelles données de géolocalisation sur la mémoire du téléphone
+        $rootScope.user.getItem('tracing').then(function (data) {
+            if (data === null) {
+                var array = [];
+            }
+            else {
+                var array = data;
+            }
+            var index = ((array !== null) ? array.length : 0);
+            array[index] = positions;
+            $rootScope.user.setItem('tracing', array);
+
+        });
+
+        console.log('sending the positions !');
+        console.log(post);
+        //On envoie les cinq dernières positions
         $http({
             method: 'POST',
             url: 'http://vayaterra.local/userlocation.php',
-            data: $.param($scope.loginData), // pass in data as strings
+            data: $.param(post), // pass in data as strings
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             }
         })
-    .success(function (data) {
-
-        if (!data.success) {
-            $scope.errorPasswd = data.errors.password;
-            $scope.errorUsername = data.errors.username;
-
-        } else {
-            //Connexion réussie
-            $scope.userdata = data.message;
-            $scope.user.setItem('data', data.message).then(
-                function () {
-
-                });
-        }
-    });
-
-
+        .success(function (data) {});
     };
-
-
-
-
-
-
-
-
 })
 
 .controller('EventsCtrl', function ($scope) {
@@ -248,8 +326,8 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
                 } else {
                     //Connexion réussie
-                    $scope.userdata = data.message;
-                    $scope.user.setItem('data', data.message).then(
+                    $rootScope.userdata = data.message;
+                    $rootScope.user.setItem('data', data.message).then(
                         function () {
 
                         });
@@ -259,15 +337,13 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     };
 })
 
-.controller('ProfileCtrl', function ($scope, $localForage) {
-    $scope.user = $localForage.instance('userdata');
-    $scope.user.getItem('data').then(function (data) {
-        $scope.userdata = data;
-    });
+.controller('ProfileCtrl', function ($scope, $localForage, $rootScope, $http) {
+
     $scope.sharelocation = function () {
 
-        $scope.user.setItem('data', $scope.userdata).then(function () {
-            console.log('ShareLog toggled : ' + $scope.userdata.shareLoc);
+        $rootScope.user.setItem('data', $rootScope.userdata).then(function () {
+            console.log('ShareLog toggled : ' + $rootScope.userdata.shareLoc);
+            $rootScope.recordLocation();
         });
     }
 })
@@ -278,14 +354,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 })
 
 .controller('MapCtrl', function ($scope, $http, $rootScope, $ionicModal, $cordovaGeolocation, $cordovaNetwork, $cordovaDeviceOrientation, $localForage, uiGmapGoogleMapApi) {
-
-    //USER DATA
-
-    $scope.user = $localForage.instance('userdata');
-    $scope.user.getItem('data').then(function (data) {
-        $scope.userdata = data;
-        //console.log(data);
-    });
 
 
     //Variables booléenne permettant l'activation des bouton watch /stop watch
@@ -363,14 +431,9 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     // Les points d'intérêt
     //___________________________________________________________________________
 
-
-    //Récuperation de l'instance de stockage local liée au données de l'application
-
-    $scope.appdata = $localForage.instance('appdata');
-
     //Fonction qui initialise les données liées aux points d'interêt de la carte
     var startPoi = function () {
-        $scope.appdata.getItem('poiList').then(function (data) {
+        $rootScope.appdata.getItem('poiList').then(function (data) {
             $scope.poilist = JSON.parse(data);
             if (typeof $scope.poilist != null && typeof $scope.poilist != null) {
                 MarkPoi()
@@ -384,7 +447,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     var getPoiDist = function (callback) {
         var post = {};
         post.getPoi = true;
-        post.allorpublic = ((typeof $scope.userdata.id_auteur != undefined) ? $scope.userdata.id_auteur : false);
+        post.allorpublic = ((typeof $rootScope.userdata.id_auteur != undefined) ? $rootScope.userdata.id_auteur : false);
         //console.log($.param(post));
         $http({
             method: 'POST',
@@ -398,7 +461,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 console.log(data);
             } else {
                 updatePoi(data.data, callback);
-                console.log(data.data);
+                //console.log(data.data);
             }
         });
     };
@@ -418,17 +481,27 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         //console.log('poilist updated')
         //console.log($scope.poilist);
     };
+    $scope.poi = {
+        count: 0,
+        id: 9999,
+        pos: {
+            latitude: 0,
+            longitude: 0
+        },
+        options: {
+            draggable: true,
+            visible: false,
+        },
+    };
 
     $scope.addPoi = function () {
-        var date = new Date();
-        var dateP = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
 
         var addPoi = {
             nom: $scope.poi.name,
             desc: $scope.poi.desc,
             type: $scope.poi.type,
             privacy: $scope.poi.privacy,
-            id_voyageur: $scope.userdata.id_auteur,
+            id_voyageur: $rootScope.userdata.id_auteur,
             latitude: $scope.poi.pos.latitude,
             longitude: $scope.poi.pos.longitude,
         }
@@ -452,19 +525,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     };
 
-    $scope.poi = {
-        count: 0,
-        id: 99999999,
-        pos: {
-
-        },
-        options: {
-            draggable: true,
-            visible: false,
-        },
-
-    };
-
     // Creation du modal de la fenêtre d'ajout de point d'interêt
     $ionicModal.fromTemplateUrl('templates/modals/addPOI.html', {
         scope: $scope,
@@ -477,6 +537,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     // Triggered in the login modal to close it
     $scope.closeAddPoi = function () {
+        //console.log('closeaddpoi');
         $scope.addPOI.hide();
         $scope.poi.options.visible = false;
         $scope.poi.count = 0;
@@ -484,9 +545,19 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     // Open the login modal
     $scope.OpenAddPoi = function () {
-        $scope.poi.count++;
-        $scope.poi.options.visible = true;
 
+
+        //console.log('openaddpoi');
+        //console.log($scope.poi.count);
+        $scope.poi.count++;
+        if ($scope.poi.count == 1) {
+            //console.log('on affiche le marker');
+            //console.log($scope.poi);
+            //On actualise le marker d'ajout de poi
+            $scope.poi.pos.latitude = $scope.userLocate.pos.latitude;
+            $scope.poi.pos.longitude = $scope.userLocate.pos.longitude;
+            $scope.poi.options.visible = true;
+        }
         if ($scope.poi.count == 2) {
             $scope.addPOI.show();
         }
@@ -494,7 +565,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             $scope.closeAddPoi();
         }
     };
-
 
     // Creation du modal de la fenêtre des point d'interêt
     $ionicModal.fromTemplateUrl('templates/modals/DetailPOI.html', {
@@ -533,7 +603,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                     rotation: 0,
                 }
             }
-
         };
     };
 
@@ -584,6 +653,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     //Fonction de suivi géolocalisé, met à jour la carte avec les dernières infos de l'utilisateur
     $scope.currentPos = function () {
         currentHeading();
+        $scope.closeAddPoi();
         var posOptions = {
             timeout: 10000,
             enableHighAccuracy: false
@@ -597,9 +667,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 //On actualise le centre de la carte
                 $scope.map.center.latitude = position.coords.latitude;
                 $scope.map.center.longitude = position.coords.longitude;
-                //On actualise le marker d'ajout de poi
-                $scope.poi.pos.latitude = position.coords.latitude;
-                $scope.poi.pos.longitude = position.coords.longitude;
 
             }, function (err) {
                 //if ($cordovaNetwork.isOffline)
@@ -637,9 +704,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 //On actualise le centre de la carte
                 $scope.map.center.latitude = position.coords.latitude;
                 $scope.map.center.longitude = position.coords.longitude;
-                //On actualise le marker d'ajout de poi
-                $scope.poi.pos.latitude = position.coords.latitude;
-                $scope.poi.pos.longitude = position.coords.longitude;
             });
     };
 
@@ -652,7 +716,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             stopWatchHeading();
             $scope.isWatching = false;
             $scope.notWatchin = true;
-        }
+        } 
     }
 
     //Fonction d'initialisation de la carte
@@ -696,40 +760,34 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 })
 
 
-.controller('SafetyGeoCtrl', function ($scope, $rootScope, $cordovaGeolocation, $cordovaNetwork) {
+.controller('SafetyGeoCtrl', function ($scope, $rootScope, $cordovaGeolocation, $cordovaNetwork, $localForage, $http) {
 
+    $scope.safetyLocCk = function () {
+        $rootScope.user.setItem('data', $rootScope.userdata).then(function () {
+            console.log('safetyLoc toggled : ' + $rootScope.userdata.safetyLoc);
+            $rootScope.recordLocation();
+            updateDb();
+        });
+    }
+    if ($rootScope.fivelastpos !== undefined) {
+        $scope.lastposition = $rootScope.fivelastpos[$rootScope.fivelastpos.length - 1];
+    }
 
-
-    $scope.monitoring = function () {
-
-        var watchOptions = {
-            timeout: 500,
-            enableHighAccuracy: false // may cause errors if true
+    var updateDb = function () {
+        var post = {
+            updateSafetyLoc  :true,
+            safetyLoc: $rootScope.userdata.safetyLoc,
+            id_voyageur : $rootScope.userdata.id_auteur
         };
-
-        $scope.watch = $cordovaGeolocation.watchPosition(watchOptions);
-
-        $scope.watch.then(
-            null,
-            function (err) {
-                //if ($cordovaNetwork.isOffline)
-                //    alert($scope.logs.deviceOffline);
-                //else
-                //    alert($scope.logs.gpsOff);
-                $scope.stopWatch;
-            },
-            function (position) {
-                var pos = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
-                }
-
-                $scope.geo.latitude = position.coords.latitude;
-                $scope.geo.longitude = position.coords.longitude;
-            });
-
-
-    };
+        $http({
+            method: 'POST',
+            url: 'http://vayaterra.local/userlocation.php',
+            data: $.param(post), // pass in data as strings
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        }).success(function (data) {});
+    }
 
 })
 
