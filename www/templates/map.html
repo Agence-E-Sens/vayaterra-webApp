@@ -2,7 +2,7 @@
     <ion-content>
         <ul class='map-tools'>
             <li ng-repeat="tool in tools" ng-show="{{tool.show}}" ng-hide="{{tool.hide}}">
-                <button class="{{tool.cssClass}}" ng-click="{{tool.fn}}">{{tool.name}}</button>
+                <button class="{{tool.cssClass}}button button-icon" ng-click="{{tool.fn}}">{{tool.name}}</button>
             </li>
 
         </ul>
