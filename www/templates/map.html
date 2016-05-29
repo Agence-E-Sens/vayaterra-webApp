@@ -4,11 +4,17 @@
             <li ng-repeat="tool in tools" ng-show="{{tool.show}}" ng-hide="{{tool.hide}}">
                 <button class="{{tool.cssClass}}" ng-click="{{tool.fn}}">{{tool.name}}</button>
             </li>
-        </ul>
-        <ui-gmap-google-map id='center='map.center' zoom='map.zoom' options="map.options">
 
-            <ui-gmap-marker  idKey="userLocate.id" coords='userLocate.pos' options="userLocate.options"></ui-gmap-marker>
+        </ul>
+        <ui-gmap-google-map center='map.center' zoom='map.zoom' options="map.options">
+
+
+            <!--<ui-gmap-marker idkey="poilist[0].id" coords='poilist[0].pos' options="userLocate.options"></ui-gmap-marker>-->
+
+            <ui-gmap-marker idkey="userLocate.id" coords='userLocate.pos' options="userLocate.options"></ui-gmap-marker>
+            <ui-gmap-marker ng-repeat='m in poilist' idkey="m.id" coords='m.pos'></ui-gmap-marker>
             
+            <ui-gmap-marker idkey="poi.id" coords='poi.pos' options='poi.options'></ui-gmap-marker>
 
         </ui-gmap-google-map>
     </ion-content>

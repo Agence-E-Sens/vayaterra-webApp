@@ -1,9 +1,32 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-    <div>Content goes here.</div>
-</body>
-</html>
+﻿<ion-modal-view class="modalPOI">
+    <ion-header-bar>
+        <h1 class="title">Ajout de point d'intérêt</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeAddPoi()">Fermer</button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <form ng-submit="addPoi()">
+            <div class="list">
+
+                <input type="text" placeholder="Nom du lieu" ng-model="poi.name">
+
+                <textarea placeholder="Description" ng-model="poi.desc"></textarea>
+                <select ng-model="poi.type">
+                    <option value="" disabled selected>Type</option>
+                    <option value="parc">Parc</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="commerce">Commerce</option>
+                    <option value="autre">Autre</option>
+                </select>
+                <select ng-model="poi.privacy">
+                    <option value="" disabled selected>Confidentialité</option>
+                    <option value="public">Publique</option>
+                    <option value="project">Projet</option>
+                    <option value="private">Privé</option>
+                </select>
+                <button class="button button-block button-positive" type="submit">Ajouter</button>
+            </div>
+        </form>
+    </ion-content>
+</ion-modal-view>
