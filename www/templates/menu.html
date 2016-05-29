@@ -14,13 +14,13 @@
 
         <ion-content>
             <ion-list>
-                <ion-item menu-close ng-hide="logged" ng-click="login()">
+                <ion-item menu-close ng-hide="userdata.logged" ng-click="login()">
                     Connexion
                 </ion-item>
-                <ion-item menu-close ng-show="logged" href="#/app/profile">
+                <ion-item menu-close ng-show="userdata.logged" href="#/app/profile">
                     Profil
                 </ion-item>
-                <ion-item menu-close ng-show="logged" href="#/app/project">
+                <ion-item menu-close ng-show="userdata.logged" href="#/app/project">
                     Mon Projet
                 </ion-item>
                 <ion-item menu-close href="#/app/events">
@@ -29,13 +29,13 @@
                 <ion-item menu-close href="#/app/map">
                     La Carte
                 </ion-item>
-                <ion-item menu-close ng-show="logged" href="#/app/safetygeo">
+                <ion-item menu-close ng-show="userdata.logged" href="#/app/safetygeo">
                     Suivi Géolocalisé
                 </ion-item>
                 <ion-item menu-close href="#/app/settings">
                     Paramètres
                 </ion-item>
-                <ion-item menu-close ng-show="logged" ng-click="disconnect()">
+                <ion-item menu-close ng-show="userdata.logged" ng-click="disconnect()">
                     Deconnexion
                 </ion-item>
             </ion-list>
