@@ -2,7 +2,7 @@
 
 
 
-	# appel SPIP
+# appel SPIP
 
 include ('sha256.inc.php');
 include ('mysql_connect.php');
@@ -14,18 +14,18 @@ $data = array();        // array to pass back data
 
 // validate the variables ========
 if (empty($_POST['username']))
-  $errors['username'] = 'Username is required.';
+    $errors['username'] = 'Username is required.';
 
 if (empty($_POST['password']))
-  $errors['password'] = 'Password is required.';
+    $errors['password'] = 'Password is required.';
 
 // return a response ==============
 
 // response if there are errors
 if (!empty($errors)) {
-  // if there are items in our errors array, return those errors
-  $data['success'] = false;
-  $data['errors']  = $errors;
+    // if there are items in our errors array, return those errors
+    $data['success'] = false;
+    $data['errors']  = $errors;
 }
 
 else {
@@ -43,7 +43,7 @@ else {
         $result = mysqli_fetch_assoc($logQuery);
         $crypted = sha256($result['alea_actuel'].$pass);
 
-        $srcLog = "SELECT `nom`, `email`, `login`,`id_auteur` FROM `spip_auteurs` WHERE `login`='$login' AND `pass`='$crypted'";
+        $srcLog = "SELECT A.id_auteur, A.email, A.login, A.nom, B.safetyLoc, B.shareLoc FROM `spip_auteurs` as A LEFT JOIN `appli_safety` as B ON A.id_auteur = B.id_voyageur WHERE A.login='$login' AND A.pass='$crypted'";
         $logQuery = mysqli_query($db,$srcLog);
 
         if(mysqli_num_rows($logQuery)){
