@@ -1,3 +1,7 @@
+.angular-google-map-container {
+    height: 100vh;
+}
+
 .map-tools {
     display: block;
     position: absolute;
@@ -22,6 +26,9 @@
                     height: 100%;
                     width: 100%;
                 }
+    }
+    .geoRefresh{
+        background-image: url('../img/icone_appli/cible.png');
     }
 }
 

@@ -472,7 +472,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     //Tableau des boutons de la carte (ex : watch actualiser etc...)
     $scope.tools = [
         {
-            name: 'Refresh',
+            name: 'Refresh pos',
             cssClass: 'geoRefresh',
             fn: 'currentPos()',
             show: '',
@@ -493,7 +493,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             hide: 'notWatchin',
         },
         {
-            name: 'add poi',
+            name: 'ADD POI',
             cssClass: 'addPoi',
             fn: 'OpenAddPoi()',
             show: 'logged',
@@ -766,6 +766,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             }
         };
     };
+
 
     //Retourne la dernière direction pointé par l'utilisateur
     var currentHeading = function () {

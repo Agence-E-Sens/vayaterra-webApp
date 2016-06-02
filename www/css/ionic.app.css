@@ -9733,9 +9733,10 @@ a.button {
 
 .menu {
   background-color: rgba(61, 58, 81, 0.88); }
-  .menu ion-list {
-    top: 50%;
-    transform: translateY(-50%); }
+  .menu .list {
+    margin-top: 50vh;
+    transform: translateY(-50%);
+    padding-left: 10px; }
   .menu::before {
     content: '';
     position: absolute;
@@ -9775,7 +9776,7 @@ a.button {
   display: block;
   width: 5vh;
   height: .5vh;
-  background: #eee;
+  background: #3d3a51;
   position: relative;
   animation-duration: 300ms;
   animation-timing-function: ease-in-out; }
@@ -9857,6 +9858,9 @@ a.button {
     width: 75%; }
   100% { } }
 
+.angular-google-map-container {
+  height: 100vh; }
+
 .map-tools {
   display: block;
   position: absolute;
@@ -9880,6 +9884,8 @@ a.button {
       outline: 0;
       height: 100%;
       width: 100%; }
+  .map-tools .geoRefresh {
+    background-image: url("../img/icone_appli/cible.png"); }
 
 a[href^="http://maps.google.com/maps"],
 a[href^="https://maps.google.com/maps"] {
