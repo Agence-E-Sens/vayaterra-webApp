@@ -12,7 +12,18 @@
             <!--<ui-gmap-marker idkey="poilist[0].id" coords='poilist[0].pos' options="userLocate.options"></ui-gmap-marker>-->
 
             <ui-gmap-marker idkey="userLocate.id" coords='userLocate.pos' options="userLocate.options"></ui-gmap-marker>
-            <ui-gmap-marker ng-repeat='m in poilist' idkey="m.id" coords='m.pos'></ui-gmap-marker>
+
+            <ui-gmap-marker ng-repeat='m in poilist' idkey="m.id" coords='m.pos' >
+                <ui-gmap-window>
+                    <div>{{m.nom}}</div>
+                </ui-gmap-window>
+            </ui-gmap-marker>
+
+            <ui-gmap-marker ng-repeat='u in usersPos' idkey="u.idkey" coords='u.pos' options="u.options">
+                <ui-gmap-window>
+                    <div>{{u.nom}}</div>
+                </ui-gmap-window>
+            </ui-gmap-marker>
             
             <ui-gmap-marker idkey="poi.id" coords='poi.pos' options='poi.options'></ui-gmap-marker>
 
