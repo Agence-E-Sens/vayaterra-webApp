@@ -8,9 +8,13 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     // listen for the $ionicView.enter event:
     //$scope.$on('$ionicView.enter', function(e) {
     //});
-
+    document.addEventListener("deviceready", function () {
+        cordova.plugins.backgroundMode.setDefaults({
+            title: "L'application tourne en fond",
+            text: ''
+        })
+    }, false);
     // Form data for the login modal
-    $scope.geolocate = true;
 
     var user = $localForage.createInstance({
         name: 'userdata',
@@ -20,6 +24,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     });
 
     //$rootScope.disturl = 'http://vayaterra.local/';
+    $rootScope.rootUrl = 'http://www.vayaterra.maamar.fr/';
     $rootScope.disturl = 'http://www.vayaterra.maamar.fr/appli/';
 
     //Récuperation de l'instance de stockage local liée au données de l'utilisateur
@@ -85,6 +90,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                     $rootScope.userdata.shareLoc = ((data.message.shareLoc !== '0' && data.message.shareLoc !== '1') ? false : Boolean(data.message.shareLoc));
                     $rootScope.userdata.safetyLoc = ((data.message.safetyLoc !== '0' && data.message.safetyLoc !== '1') ? false : Boolean(data.message.safetyLoc));
                     $rootScope.userdata.logged = true;
+                    data.message.img = $rootScope.userdata.img = getProfileImg();
                     //console.log($rootScope.userdata);
                     $rootScope.user.setItem('data', data.message).then(function () {
                         $scope.closeLogin();
@@ -96,6 +102,39 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 }
             });
     };
+
+    //var getProfileImg = function (path) {
+
+    //}
+
+    var getProfileImg = function () {
+        var path = $rootScope.rootUrl + "IMG/auton" + $rootScope.userdata.id_auteur;
+        var def = $rootScope.rootUrl + "IMG/autondefault.jpg";
+        if (testImg(path + '.jpg')) {
+            return path + '.jpg';
+        }
+        else if (testImg(path + '.gif')) {
+            return path + '.gif';
+        }
+
+        else if (testImg(path + '.png')) {
+            return path + '.png';
+        }
+
+        else return def;
+    }
+    var testImg = function (url) {
+        var http = new XMLHttpRequest();
+
+        http.open('HEAD', url, false);
+        http.send();
+
+        if (http.status != 404)
+            return true;
+        else return false;
+    }
+
+
 
     //deconnexion
     $scope.disconnect = function () {
@@ -172,6 +211,20 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     //Fonction qui permet de lancer la géolocalisation de fond
     $rootScope.SGLWatch = function () {
+        document.addEventListener("deviceready", function () {
+
+        }, false);
+
+
+        if (!cordova.plugins.backgroundMode.isEnabled()) {
+            cordova.plugins.backgroundMode.enable();
+
+        }
+        cordova.plugins.backgroundMode.onactivate = function () {
+            $rootScope.counterDataSent = 0;
+        };
+
+
         $rootScope.fivelastpos = [];
         var watchOptions = {
             timeout: 30000,
@@ -193,7 +246,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 //console.log('new pos');
                 var pos = {
                     latitude: position.coords.latitude,
-                    longitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
                     date: getDate(),
                     heure: getTime()
                 }
@@ -207,6 +260,9 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     //Fonction qui permet de stopper la géolocalisation de fond 
     $rootScope.SGLStop = function (callback) {
+        document.addEventListener("deviceready", function () {
+            cordova.plugins.backgroundMode.disable();
+        }, false);
         $rootScope.SGL.clearWatch();
         $rootScope.sendSGL();
         $rootScope.SGL = undefined;
@@ -299,7 +355,10 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             })
             .success(function (data) {
                 console.log('data sent');
-
+                $rootScope.counterDataSent++;
+                cordova.plugins.backgroundMode.configure({
+                    title: "Données envoyées " + $rootScope.counterDataSent + " fois",
+                });
                 //console.log(data);
                 //if (data.success) {
 
@@ -834,6 +893,4 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
 
 
-})
-
-;
+});

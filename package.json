@@ -33,7 +33,11 @@
     "cordova-plugin-network-information@1.2.0",
     "cordova-plugin-dialogs@1.2.0",
     "cordova-plugin-vibration@2.1.0",
-    "cordova-plugin-whitelist@1.2.2"
+    "cordova-plugin-whitelist@1.2.2",
+    {
+      "locator": "https://github.com/katzer/cordova-plugin-badge.git",
+      "id": "cordova-plugin-badge"
+    }
   ],
   "cordovaPlatforms": [
     "android"
