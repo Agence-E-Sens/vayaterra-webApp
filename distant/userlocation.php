@@ -68,6 +68,7 @@ if(isset($_POST['getFriendsLoc'])){
     $data['project']=array();
     $data['autres']=array();
 
+    //REQUETE ID COLLABS PROJET.
     $id_collabs = array();
 
     $req  = "SELECT DISTINCT ";
@@ -76,9 +77,11 @@ if(isset($_POST['getFriendsLoc'])){
     $req .= "	spip_auteurs as aut ";
     $req .= "	LEFT JOIN spip_auteurs_liens as autl ON aut.id_auteur = autl.id_auteur ";
     $req .= "	LEFT JOIN spip_articles as art ON autl.id_objet = art.id_article ";
+    $req .= "	LEFT JOIN appli_safety as sf ON sf.id_voyageur = aut.id_auteurs ";
     $req .= "WHERE ";
     $req .= "	art.id_secteur = 16";
     $req .= "    AND art.statut = 'publie'";
+    $req .= "    AND sf.shareLoc = 1";
     $req .= "    AND aut.id_auteur != $id";
 
     $request = mysqli_query($db,$req);
@@ -87,32 +90,48 @@ if(isset($_POST['getFriendsLoc'])){
     }
 
 
-    $selectAll = "SELECT * FROM `appli_tracing` WHERE `id_voyageur` != $id";
-    $res = mysqli_query($db,$selectAll);
-    while ($_5pos = mysqli_fetch_assoc($res)){
+    //REQUETES DONNEES DE LOCALISATION GLOBALES
 
-        array_push($data['autres'],$marker);
-        array_push($data['autres'],$marker);
+    $req  = "SELECT DISTINCT ";
+    $req .= "	*";
+    $req .= "FROM ";
+    $req .= "	spip_auteurs as aut ";
+    $req .= "	LEFT JOIN appli_tracing as tr ON tr.id_voyageur = aut.id_auteurs ";
+    $req .= "	LEFT JOIN appli_safety as sf ON sf.id_voyageur = aut.id_auteurs ";
+    $req .= "WHERE ";
+    $req .= "    sf.shareLoc = 1";
+    $req .= "    AND aut.id_auteur != $id";
+    foreach($id_collabs as $value)
+    {
+        $req .= "AND aut.id_auteur != $value";
+    }
+
+    $selectAll = mysqli_query($db,$req);
+    while ($_5pos = mysqli_fetch_assoc($selectAll)){
+        array_push($data['autres'],$_5pos);
     }
 
 
+    //REQUETE DONNEES DE LOCALISATION COLLABS
 
+    $req  = "SELECT DISTINCT ";
+    $req .= "	*";
+    $req .= "FROM ";
+    $req .= "	spip_auteurs as aut ";
+    $req .= "	LEFT JOIN appli_tracing as tr ON tr.id_voyageur = aut.id_auteurs ";
+    $req .= "	LEFT JOIN appli_safety as sf ON sf.id_voyageur = aut.id_auteurs ";
+    $req .= "WHERE ";
+    $req .= "    sf.shareLoc = 1";
+    $req .= "    AND aut.id_auteur != $id";
+    foreach($id_collabs as $value)
+    {
+        $req .= "AND aut.id_auteur = $value";
+    }
+    $selectCol = mysqli_query($db,$req);
 
-    $tra  ="SELECT ";
-    $tra .="	* ";
-    $tra .="FROM ";
-    $tra .="	appli_tracing as tra ";
-    $tra .="	LEFT JOIN spip_auteurs as aut ON tra.id_voyageur = aut.id_auteur ";
-    $tra .="WHERE";
-    $tra .="1";
-
-
-
-
-
-
-
-
+    while ($_5pos = mysqli_fetch_assoc($selectCol)){
+        array_push($data['project'],$_5pos);
+    }
 
     //echo $ins;
     echo json_encode($data);
