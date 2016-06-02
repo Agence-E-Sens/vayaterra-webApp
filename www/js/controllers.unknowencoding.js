@@ -90,7 +90,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                     $rootScope.userdata.shareLoc = ((data.message.shareLoc !== '0' && data.message.shareLoc !== '1') ? false : Boolean(data.message.shareLoc));
                     $rootScope.userdata.safetyLoc = ((data.message.safetyLoc !== '0' && data.message.safetyLoc !== '1') ? false : Boolean(data.message.safetyLoc));
                     $rootScope.userdata.logged = true;
-                    data.message.img = $rootScope.userdata.img = $rootScope.getProfileImg($rootScope.userdata.id_auteur);
+                    data.message.img = $rootScope.userdata.img = getProfileImg();
                     //console.log($rootScope.userdata);
                     $rootScope.user.setItem('data', data.message).then(function () {
                         $scope.closeLogin();
@@ -107,8 +107,8 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
     //}
 
-    $rootScope.getProfileImg = function (idauteur) {
-        var path = $rootScope.rootUrl + "IMG/auton" + idauteur;
+    var getProfileImg = function () {
+        var path = $rootScope.rootUrl + "IMG/auton" + $rootScope.userdata.id_auteur;
         var def = $rootScope.rootUrl + "IMG/autondefault.jpg";
         if (testImg(path + '.jpg')) {
             return path + '.jpg';
@@ -228,7 +228,7 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         $rootScope.fivelastpos = [];
         var watchOptions = {
             timeout: 30000,
-            enableHighAccuracy: true // may cause errors if true
+            enableHighAccuracy: false // may cause errors if true
         };
         $rootScope.SGL = $cordovaGeolocation.watchPosition(watchOptions);
         $rootScope.SGL.then(
@@ -498,7 +498,21 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
             fn: 'OpenAddPoi()',
             show: 'logged',
             hide: '',
-        }
+        },
+        {
+            name: 'add event',
+            cssClass: 'addPoi',
+            fn: 'OpenAddPoi()',
+            show: 'logged',
+            hide: '',
+        },
+        {
+            name: 'update poi',
+            cssClass: 'addPoi',
+            fn: 'updatePoi()',
+            show: '',
+            hide: '',
+        },
     ];
 
     //initialisation des paramètres de la carte
@@ -567,63 +581,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
         //console.log('markpoi');
         //console.log($scope.poilist);
     };
-
-    //Fonction qui récupère les positions utilsateurs
-
-    var getUsersPos = function () {
-        var post = {};
-        post.usersPos = true;
-        post.id_voyageur = $rootScope.userdata.id_auteur;
-        //console.log($.param(post));
-        $http({
-            method: 'POST',
-            url: $rootScope.disturl + 'userlocation.php',
-            data: $.param(post), // pass in data as strings
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-        }).success(function (data) {
-            addUsersonMap(data.autres);
-        });
-    }
-
-    var addUsersonMap = function (data) {
-
-        $scope.usersPos = [];
-        //console.log(data);
-        data.forEach(function (obj) {
-
-            obj.serie5 = JSON.parse(obj.serie5);
-
-            var icon = {
-                url: $rootScope.getProfileImg(obj.id_auteur),
-                scaledSize: new google.maps.Size(30, 30),
-                origin: new google.maps.Point(0, 0),
-                anchor: new google.maps.Point(0, 0),
-            }
-
-            var user = {
-                idkey: '888' + obj.id_auteur,
-                nom: obj.login,
-                pos: {
-                    latitude: obj.serie5[obj.serie5.length - 1].latitude,
-                    longitude: obj.serie5[obj.serie5.length - 1].longitude
-                },
-                options: {
-                    icon: icon
-                }
-
-            }
-
-            $scope.usersPos.push(user);
-        })
-
-        //console.log($scope.usersPos);
-
-
-
-    }
-
 
     var updatePoi = function (data, callback) {
 
@@ -814,11 +771,10 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
     //Fonction de suivi géolocalisé, met à jour la carte avec les dernières infos de l'utilisateur
     $scope.currentPos = function () {
         currentHeading();
-        getUsersPos();
         //$scope.closeAddPoi();
         var posOptions = {
             timeout: 10000,
-            enableHighAccuracy: true
+            enableHighAccuracy: false
         };
         $cordovaGeolocation
             .getCurrentPosition(posOptions)
@@ -843,8 +799,8 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
 
         watchHeading();
         var watchOptions = {
-            timeout: 1000,
-            enableHighAccuracy: true // may cause errors if true
+            timeout: 100,
+            enableHighAccuracy: false // may cause errors if true
         };
         $scope.watch = $cordovaGeolocation.watchPosition(watchOptions);
         $scope.isWatching = true;
@@ -866,7 +822,6 @@ angular.module('vayaterra.controllers', ['uiGmapgoogle-maps', 'LocalForageModule
                 //On actualise le centre de la carte
                 $scope.map.center.latitude = position.coords.latitude;
                 $scope.map.center.longitude = position.coords.longitude;
-
             });
     };
 

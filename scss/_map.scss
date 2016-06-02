@@ -1,0 +1,48 @@
+.map-tools {
+    display: block;
+    position: absolute;
+    z-index: 90;
+    bottom: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    li {
+        z-index: 91;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        display: block;
+        height: 60px;
+        width: 60px;
+        overflow: hidden;
+        background-color: white;
+                button {
+                    z-index: 92;
+                    outline: 0;
+                    height: 100%;
+                    width: 100%;
+                }
+    }
+}
+
+a[href^="http://maps.google.com/maps"],
+a[href^="https://maps.google.com/maps"] {
+    display: none !important;
+}
+
+.gmnoprint a,
+.gmnoprint span,
+.gm-style-cc {
+    display: none;
+}
+
+.gmnoprint div {
+    background: none !important;
+}
+
+.modalPOI {
+    width: calc(100% - 60px);
+    height: 50%;
+    left: 60px;
+    top: 50%;
+}
